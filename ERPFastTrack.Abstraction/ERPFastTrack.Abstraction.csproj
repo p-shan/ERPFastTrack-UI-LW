@@ -5,6 +5,10 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
+    <PropertyGroup>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>erpfasttrack-signkey.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\ERPFastTrack.Common\ERPFastTrack.Common.csproj" />

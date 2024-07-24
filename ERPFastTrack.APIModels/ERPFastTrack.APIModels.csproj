@@ -6,6 +6,10 @@
         <Nullable>enable</Nullable>
     </PropertyGroup>
 
+    <PropertyGroup>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>erpfasttrack-signkey.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
     <ItemGroup>
         <Folder Include="AuthModels\Response\" />
         <Folder Include="AuthModels\Request\" />

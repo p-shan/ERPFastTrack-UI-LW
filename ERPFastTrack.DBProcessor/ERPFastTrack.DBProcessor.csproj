@@ -6,6 +6,10 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+    <PropertyGroup>
+        <SignAssembly>True</SignAssembly>
+        <AssemblyOriginatorKeyFile>erpfasttrack-signkey.snk</AssemblyOriginatorKeyFile>
+    </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Carbunql" Version="0.5.6" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
