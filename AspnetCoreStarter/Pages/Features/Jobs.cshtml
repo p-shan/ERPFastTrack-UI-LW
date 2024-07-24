@@ -1,0 +1,554 @@
+@page
+@model AspnetCoreStarter.Pages.Features.JobsModel
+@{
+	ViewData["Title"] = "Jobs";
+}
+
+@section VendorStyles {
+	<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/umd/styles/index.min.css" />
+	<link rel="stylesheet" href="~/vendor/libs/select2/select2.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/tagify/tagify.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/animate-css/animate.dist.css" />
+}
+
+@section VendorScripts {
+	<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.dist.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/bundle/popular.min.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-bootstrap5/index.min.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-auto-focus/index.min.js"></script>
+	<script src="~/vendor/libs/select2/select2.dist.js"></script>
+	<script src="~/vendor/libs/tagify/tagify.dist.js"></script>
+	<script src="~/vendor/libs/bootstrap-select/bootstrap-select.dist.js"></script>
+	<script src="~/vendor/libs/typeahead-js/typeahead.dist.js"></script>
+	<script src="~/vendor/libs/bloodhound/bloodhound.dist.js"></script>
+}
+
+@section PageScripts {
+	<script src="~/js/app-jobs.dist.js"></script>
+}
+
+@* ************** Content ************** *@
+<h4 class="mb-4">Jobs</h4>
+
+<!-- Projects Section -->
+<div class="card" id="hbsOutersectionProjects">
+</div>
+
+<!-- Jobs Section -->
+<div class="my-4 card" id="hbsOutersectionJobs">
+</div>
+
+<!-- Jobs Details Section -->
+<div id="hbsOutersectionUpsertJobs">
+</div>
+
+
+<script id="hbsProjects" type="text/x-handlebars-template">
+	<div class="card" id="hbsInnersectionProjects">
+		<h5 class="card-header">Select Project</h5>
+		<div class="card-body">
+			<div class="row">
+				<div class="col-xl-6 mb-4">
+					<select id="selProjects" class="form-select form-select-lg form-control" name="Projects" data-allow-clear="true" placeholder="Projects">
+						<option></option>
+					</select>
+				</div>
+				<div class="col-xl-6 mb-4">
+					<button type="button" id="btnLoadJobs" class="btn btn-primary">Load Jobs</button>
+				</div>
+			</div>
+			<button type="button" id="btnClearJobs" class="btn btn-label-dark waves-effect">Clear</button>
+		</div>
+	</div>
+</script>
+
+
+<script id="hbsJobs" type="text/x-handlebars-template">
+	<div class="card-datatable table-responsive" id="hbsInnersectionJobs">
+		<h5 class="card-header">Jobs in {{data}} Project</h5>
+
+		<div class="card-body">
+			<table id="dtJobs" class="datatables-jobs table border-top">
+				<thead>
+					<tr>
+						<th></th>
+						<th></th>
+						<th>Name</th>
+						<th>Type</th>
+						<th>{{srcHeaderName}}</th>
+						<th>{{destHeaderName}}</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</script>
+
+
+<script id="hbsUpsertJobs" type="text/x-handlebars-template">
+	<div id="hbsInnersectionUpsertJobs">
+		<div class="px-4 card sticky-element">
+			<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+
+				<div class="d-flex flex-column justify-content-center">
+					<h4 class="mb-1 mt-3">Add a new Job</h4>
+					<p class="text-muted">Fill the required information to create the Job</p>
+				</div>
+				<div class="d-flex align-content-center flex-wrap gap-3">
+					<div class="d-flex gap-3">
+						<button id="btnDiscardJob" class="btn btn-label-secondary waves-effect" fdprocessedid="zd74p5">Discard</button>
+						<button id="btnSaveJob" class="btn btn-success waves-effect" fdprocessedid="tolheh">Save Job</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="px-4 mt-4">
+
+			<div class="row">
+				<!-- View sales -->
+				<div class="col-xl-6 col-lg-6 col-12">
+					<div class="card h-100">
+						<div class="card-body text-nowrap">
+							<h5 class="card-title mb-0">Provide Job Name</h5>
+							<div class="mt-3">
+								<input type="text" id="txtJobName" class="form-control" placeholder="Job Name" />
+							</div>
+						</div>
+					</div>
+				</div>
+				<!-- View sales -->
+				<!-- Statistics -->
+
+				<div class="col-xl-3 col-lg-3 col-6">
+					<div class="card text-center h-100">
+						<div class="card-body">
+						{{#if (eq projectTypeId 1)}}
+							<div class="badge rounded-pill p-2 bg-label-primary mb-2"><i class="fa-solid fa-database fa-2x fa-fw"></i></div>
+							<p class="card-text mt-3">{{sourceConnName}}</p>
+						{{else if (eq projectTypeId 2)}}
+							<div class="badge rounded-pill p-2 bg-label-warning mb-2"><i class="fa-solid fa-file fa-2x fa-fw"></i></div>
+							<p class="card-text mt-3">{{sourceConnName}}</p>
+						{{/if}}
+
+
+						</div>
+					</div>
+				</div>
+
+				<div class="col-xl-3 col-lg-3 col-6">
+					<div class="card text-center h-100">
+						<div class="card-body">
+							<div class="badge rounded-pill p-2 bg-label-info mb-2"><i class="fa-brands fa-salesforce fa-2x fa-fw"></i></div>
+							<p class="card-text mt-3">{{sfConnName}}</p>
+						</div>
+					</div>
+				</div>
+				<!--/ Statistics -->
+			</div>
+
+			<h5 class="py-3 my-3"><span class="text-muted fw-light">Job /</span> Job Details</h5>
+			<div class="row">
+				<div class="col-xl-5 col-12">
+					{{#if (eq projectTypeId 1)}}
+						<div class="card bg-label-primary mb-3">
+							<div class="card-body card-sourceDetails">
+								<div class="text-center"><div class="badge rounded-pill p-2 bg-label-primary mb-2"><i class="fa-solid fa-database fa-2x fa-fw"></i></div></div>
+								<h5 class="card-title text-center">Database Queries</h5>
+								<select id="selSourceDetails" class="form-select form-select-lg form-control" name="SourceDetails" data-allow-clear="true" placeholder="Database Queries">
+									<option></option>
+								</select>
+							</div>
+						</div>
+					{{else if (eq projectTypeId 2)}}
+						<div class="card bg-label-warning mb-3">
+							<div class="card-body card-sourceDetails">
+								<div class="text-center"><div class="badge rounded-pill p-2 bg-label-warning mb-2"><i class="fa-solid fa-file fa-2x fa-fw"></i></div></div>
+								<h5 class="card-title text-center">Files</h5>
+								<select id="selSourceDetails" class="form-select form-select-lg form-control" name="SourceDetails" data-allow-clear="true" placeholder="Database Queries">
+									<option></option>
+								</select>
+							</div>
+						</div>
+					{{/if}}
+				</div>
+				<div class="col-xl-2 col-12"></div>
+				<div class="col-xl-5 col-12">
+					<div class="card bg-label-info mb-3">
+						<div class="card-body card-sfobjects">
+							<div class="text-center"><div class="badge rounded-pill p-2 bg-label-info mb-2"><i class="fa-brands fa-salesforce fa-2x fa-fw"></i></div></div>
+							<h5 class="card-title text-center">Salesforce Objects</h5>
+							<select id="selSfObjects" class="form-select form-select-lg form-control" name="SfObjects" data-allow-clear="true" placeholder="Salesforce Objects">
+								<option></option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+
+			<div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center my-3">
+
+				<div class="d-flex flex-column justify-content-center">
+					<h5 class="mb-1 mt-1"><span class="text-muted fw-light">Job / Job Details /</span> Mappings</h5>
+				</div>
+				<div class="d-flex align-content-center flex-wrap gap-3">
+					<div class="d-flex gap-3">
+						<button id="btnResetMapping" class="btn btn-label-secondary waves-effect" fdprocessedid="zd74p5">Reset</button>
+						<button id="btnStartMapping" class="btn btn-label-warning waves-effect" fdprocessedid="tolheh">Start Mapping</button>
+					</div>
+				</div>
+			</div>
+
+			<div id="hbsOutersectionMapping"></div>
+		</div>
+	</div>
+</script>
+
+<script id="hbsMapping" type="text/x-handlebars-template">
+	<div id="hbsInnersectionMapping">
+
+	<div class="modal fade" id="backDropModal" data-bs-backdrop="static" tabindex="-1" style="display: none;" aria-hidden="true">
+		<div class="modal-dialog">
+			<form class="modal-content" onSubmit="return false;">
+				<div class="modal-header">
+					<h5 class="modal-title" id="backDropModalTitle">Select Field</h5>
+					<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" fdprocessedid="bvz6g"></button>
+				</div>
+				<div class="modal-body">
+					<div class="row">
+						<div class="col-xl-1 text-center py-3"><i class="ti ti-search"></i></div>
+						<div class="col-xl-11">
+							<div class="form-floating mb-2">
+								<input type="text" class="form-control" id="floatingInput" aria-describedby="floatingInputHelp" fdprocessedid="yunz9">
+								<label for="floatingInput">Search</label>
+							</div>
+						</div>
+					</div>
+					<hr />
+					<div class="nav-align-top nav-tabs-shadow">
+						<ul class="nav nav-tabs nav-fill" role="tablist">
+							<li class="nav-item">
+								<button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-left-home" aria-controls="navs-pills-left-home" aria-selected="true">All</button>
+							</li>
+							<li class="nav-item">
+								<button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-left-profile" aria-controls="navs-pills-left-profile" aria-selected="false" tabindex="-1">Custom</button>
+							</li>
+							<li class="nav-item">
+								<button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-left-messages" aria-controls="navs-pills-left-messages" aria-selected="false" tabindex="-1">Required</button>
+							</li>
+							<li class="nav-item">
+								<button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-left-messages1" aria-controls="navs-pills-left-messages" aria-selected="false" tabindex="-1">Ids</button>
+							</li>
+							<li class="nav-item">
+								<button type="button" class="nav-link" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-left-messages2" aria-controls="navs-pills-left-messages" aria-selected="false" tabindex="-1">Unmapped</button>
+							</li>
+						</ul>
+						<div class="tab-content">
+							<div class="tab-pane fade show active" id="navs-pills-left-home" role="tabpanel">
+								<small class="text-light fw-medium">Ids</small>
+								<div class="list-group">
+									{{#each sfObjectData }}
+									{{#if (eq category 'Ids')}}
+									<a href="javascript:void(0);" class="list-group-item list-group-item-action" data-name="{{name}}" data-id="{{id}}">{{name}}</a>
+									{{/if}}
+									{{/each}}
+								</div>
+								<small class="text-light fw-medium">Required</small>
+								<div class="list-group">
+									{{#each sfObjectData }}
+									{{#if (eq category 'Required')}}
+									<a href="javascript:void(0);" class="list-group-item list-group-item-action" data-name="{{name}}" data-id="{{id}}">{{name}}</a>
+									{{/if}}
+									{{/each}}
+								</div>
+								<small class="text-light fw-medium">Custom</small>
+								<div class="list-group">
+									{{#each sfObjectData }}
+									{{#if (eq category 'Custom')}}
+									<a href="javascript:void(0);" class="list-group-item list-group-item-action" data-name="{{name}}" data-id="{{id}}">{{name}}</a>
+									{{/if}}
+									{{/each}}
+								</div>
+								<small class="text-light fw-medium">Unmapped</small>
+								<div class="list-group">
+									{{#each sfObjectData }}
+									{{#if (eq category 'Unmapped')}}
+									<a href="javascript:void(0);" class="list-group-item list-group-item-action" data-name="{{name}}" data-id="{{id}}">{{name}}</a>
+									{{/if}}
+									{{/each}}
+								</div>
+							</div>
+							<div class="tab-pane fade" id="navs-pills-left-profile" role="tabpanel">
+								<div class="list-group">
+									{{#each sfObjectData }}
+									{{#if (eq category 'Custom')}}
+									<a href="javascript:void(0);" class="list-group-item list-group-item-action" data-name="{{name}}" data-id="{{id}}">{{name}}</a>
+									{{/if}}
+									{{/each}}
+								</div>
+							</div>
+							<div class="tab-pane fade" id="navs-pills-left-messages" role="tabpanel">
+								<div class="list-group">
+									{{#each sfObjectData }}
+									{{#if (eq category 'Required')}}
+									<a href="javascript:void(0);" class="list-group-item list-group-item-action" data-name="{{name}}" data-id="{{id}}">{{name}}</a>
+									{{/if}}
+									{{/each}}
+								</div>
+							</div>
+							<div class="tab-pane fade" id="navs-pills-left-messages1" role="tabpanel">
+								<div class="list-group">
+									{{#each sfObjectData }}
+									{{#if (eq category 'Ids')}}
+									<a href="javascript:void(0);" class="list-group-item list-group-item-action" data-name="{{name}}" data-id="{{id}}">{{name}}</a>
+									{{/if}}
+									{{/each}}
+								</div>
+							</div>
+							<div class="tab-pane fade" id="navs-pills-left-messages2" role="tabpanel">
+								<div class="list-group">
+									{{#each sfObjectData }}
+									{{#if (eq category 'Unmapped')}}
+									<a href="javascript:void(0);" class="list-group-item list-group-item-action" data-name="{{name}}" data-id="{{id}}">{{name}}</a>
+									{{/if}}
+									{{/each}}
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+		{{#each fields}}
+		<div class="row row{{@@index}}">
+			<div class="col-xl-5 col-12">
+				<div class="card">
+					<div class="card-body">
+						<input data-fieldindex="{{@@index}}" type="text" class="form-control srcfield{{@@index}}" value="{{fieldId}}" data-fieldtype="{{fieldType}}" data-fieldname="{{fieldName}}" disabled />
+						<hr />
+						<span class="fw-bold">
+							{{fieldName}}
+						</span>
+						<div class="float-end text-end w-50">
+							<p class="text-muted mb-0">Sample</p>
+							<span class="text-primary">{{sampleValue}}</span>
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-2 col-12">
+				<div class="text-center mt-3"><i class="display-6 ti ti-arrow-narrow-right"></i></div>
+			</div>
+			<div class="col-xl-5 col-12">
+				<div class="card">
+					<div class="card-header header-elements">
+						<span class="me-2 sfField{{@@index}}">❗Field not selected</span>
+
+						<div class="card-header-elements ms-auto">
+							<button type="button" class="pull-right btn btn-sm btn-primary waves-effect waves-light buttonField{{@@index}} btnSfDb" data-buttonindex="{{@@index}}" data-bs-toggle="modal" data-bs-target="#backDropModal">
+								Select
+							</button>
+							<button type="button" class="pull-right btn btn-sm btn-danger waves-effect waves-light buttonDelield{{@@index}} btnSfDbDel" data-buttonindex="{{@@index}}" >
+								<i class="ti ti-trash"></i>
+							</button>
+						</div>
+						</div>
+						<div class="hbsOutersectionExtraMappingDetail{{@@index}}">
+					</div>
+				</div>
+			</div>
+		</div>
+		<hr />
+		{{/each}}
+	</div>
+</script>
+
+<script id="hbsExtraMappingDetail" type="text/x-handlebars-template">
+	<div class="card-body pt-0 divExtraMappingDetail{{index}}" data-extramapdet-index="{{index}}">
+		{{#if isExternalId }}
+		<div class="togExterId{{index}}">
+			<label class="switch">
+				<input type="checkbox" class="switch-input chkbxExternalId{{index}}" data-extramapdet-index="{{index}}" />
+				<span class="switch-toggle-slider">
+					<span class="switch-on"></span>
+					<span class="switch-off"></span>
+				</span>
+				<span class="switch-label">External Id</span>
+			</label>
+		</div>
+		{{/if }}
+		{{#if isLookup }}
+		<div class="togLookup{{index}}">
+			<label class="switch mb-2">
+				<input type="checkbox" class="switch-input chkbxLookup{{index}}" data-extramapdet-index="{{index}}" />
+				<span class="switch-toggle-slider">
+					<span class="switch-on"></span>
+					<span class="switch-off"></span>
+				</span>
+				<span class="switch-label">Lookup</span>
+			</label>
+
+			<select class="form-select form-select-lg form-control selLookup{{index}}" name="Lookup" data-allow-clear="true" placeholder="Lookup" style="display:none">
+				<option></option>
+			</select>
+		{{/if }}
+		</div>
+	</div>
+</script>
+
+
+<script id="hbsMappings" type="text/x-handlebars-template">
+	<div id="hbsInnersectionMapping">
+
+		<div class="row">
+			<div class="col-xl-5 col-12">
+				<div class="card">
+					<div class="card-body">
+						<input type="text" class="form-control" disabled />
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-2 col-12">
+				<div class="text-center mt-3"><i class="display-6 ti ti-arrow-narrow-right"></i></div>
+			</div>
+			<div class="col-xl-5 col-12">
+				<div class="card">
+					<div class="card-header header-elements">
+						<span class=" me-2">❗Field not selected</span>
+
+						<div class="card-header-elements ms-auto">
+							<button type="button" class="pull-right btn btn-sm btn-secondary waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#backDropModal" fdprocessedid="q81vyq">
+								Select
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<hr />
+		<div class="row">
+			<div class="col-xl-5 col-12">
+				<div class="card">
+					<div class="card-body">
+						<input type="text" class="form-control" disabled />
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-2 col-12">
+				<div class="text-center mt-3"><i class="display-6 ti ti-arrow-narrow-right"></i></div>
+			</div>
+			<div class="col-xl-5 col-12">
+				<div class="card">
+					<div class="card-header header-elements">
+						<span class=" me-2">
+							❗<input type="text" class="form-control" placeholder="Field Not Selected" disabled />
+						</span>
+
+						<div class="card-header-elements ms-auto">
+							<button type="button" class="pull-right btn btn-sm btn-secondary waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#backDropModal" fdprocessedid="q81vyq">
+								Select
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<hr />
+		<div class="row">
+			<div class="col-xl-5 col-12">
+				<div class="card">
+					<div class="card-body">
+						<input type="text" class="form-control" disabled />
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-2 col-12">
+				<div class="text-center mt-3"><i class="display-6 ti ti-arrow-narrow-right"></i></div>
+			</div>
+			<div class="col-xl-5 col-12">
+				<div class="card">
+					<div class="card-header header-elements">
+						<span class=" me-2">
+							❗<input type="text" class="form-control" placeholder="Field Not Selected" disabled />
+						</span>
+
+						<div class="card-header-elements ms-auto">
+							<button type="button" class="pull-right btn btn-sm btn-secondary waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#backDropModal" fdprocessedid="q81vyq">
+								Select
+							</button>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		<hr />
+		<div class="row">
+			<div class="col-xl-5 col-12">
+				<div class="card">
+					<div class="card-body">
+						<input type="text" class="form-control" disabled />
+					</div>
+				</div>
+			</div>
+			<div class="col-xl-2 col-12">
+				<div class="text-center mt-3"><i class="display-6 ti ti-arrow-narrow-right"></i></div>
+			</div>
+			<div class="col-xl-5 col-12">
+				<div class="card">
+					<div class="card-header header-elements pb-1">
+						<span class=" me-2">
+							❗<input type="text" class="form-control" placeholder="Field Not Selected" disabled />
+						</span>
+
+						<div class="card-header-elements ms-auto">
+							<button type="button" class="pull-right btn btn-sm btn-secondary waves-effect waves-light" data-bs-toggle="modal" data-bs-target="#backDropModal" fdprocessedid="q81vyq">
+								Select
+							</button>
+						</div>
+					</div>
+					<div class="card-body">
+						<div>
+							<label class="switch">
+								<input type="checkbox" class="switch-input" />
+								<span class="switch-toggle-slider">
+									<span class="switch-on"></span>
+									<span class="switch-off"></span>
+								</span>
+								<span class="switch-label">External Id</span>
+							</label>
+						</div>
+						<div>
+							<label class="switch mb-2">
+								<input type="checkbox" class="switch-input" />
+								<span class="switch-toggle-slider">
+									<span class="switch-on"></span>
+									<span class="switch-off"></span>
+								</span>
+								<span class="switch-label">Lookup</span>
+							</label>
+
+							<select class="select2 form-select form-select-lg" data-allow-clear="true">
+								<option value="NY">New York</option>
+								<option value="NC">North Carolina</option>
+								<option value="OH">Ohio</option>
+								<option value="PA">Pennsylvania</option>
+								<option value="RI">Rhode Island</option>
+								<option value="SC">South Carolina</option>
+								<option value="VT">Vermont</option>
+								<option value="VA">Virginia</option>
+								<option value="WV">West Virginia</option>
+							</select>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>

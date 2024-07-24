@@ -1,0 +1,36 @@
+version: '3.4'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=Your!Password
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - D:\MyWork\Eventus\UI_Work\Vuexy\vuexyadmin-970\vuexy-admin-v9.7.0\aspnet-core\ERPFastTrack.v2.UI.LW\DockerSetup\sql-scripts:/docker-entrypoint-initdb.d
+      - D:\MyWork\Eventus\UI_Work\Vuexy\vuexyadmin-970\vuexy-admin-v9.7.0\aspnet-core\ERPFastTrack.v2.UI.LW\DockerSetup\dbdata:/docker-entrypoint-initsh.d
+    command: >
+      bash -c '
+      /docker-entrypoint-initsh.d/entrypoint.sh
+      '
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P Your!Password -Q 'SELECT 1'"]
+      interval: 3s
+      timeout: 10s
+      retries: 5
+  aspnetcorestarter:
+    image: ${DOCKER_REGISTRY-}aspnetcorestarter
+    depends_on:
+      sqlserver:
+        condition: service_healthy
+    build:
+      context: .
+      dockerfile: AspnetCoreStarter/Dockerfile
+    ports:
+      - "80:80"
+    environment:
+      ERPFT_CONNECTION_STRING: "Server=sqlserver;Database=master;User Id=sa;Password=Your!Password;TrustServerCertificate=True"
+      ERPFT_DB_SCHEMA: "dbo"

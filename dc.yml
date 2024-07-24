@@ -1,0 +1,30 @@
+version: '3.4'
+
+services:
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2019-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=olaola
+      - MSSQL_PID=Express
+    ports:
+      - "1433:1433"
+    volumes:
+      - D:\MyWork\Eventus\UI_Work\Vuexy\vuexyadmin-970\vuexy-admin-v9.7.0\aspnet-core\ERPFastTrack.v2.UI.LW\DockerSetup\sql-scripts:/docker-entrypoint-initdb.d  # Mount SQL scripts directory
+    command: >
+      bash -c '
+      /opt/mssql-tools/bin/sqlcmd -S sqlserver -U sa -P olaola -d master -i docker-entrypoint-initdb.d/InitialCreate.sql;
+      echo "All done!";
+      '     
+    healthcheck:
+      test: [ "CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "olaola", "-Q", "SELECT 1" ]
+      interval: 10s
+      retries: 5
+  # aspnetcorestarter:
+  #   image: ${DOCKER_REGISTRY-}aspnetcorestarter
+  #   build:
+  #     context: .
+  #     dockerfile: AspnetCoreStarter/Dockerfile
+  #   environment:
+  #     ERPFT_CONNECTION_STRING: "Server=sqlserver;Database=YourDatabaseName;User Id=sa;Password=olaola;"  # Replace with your SQL Server connection string
+  #     ERPFT_DB_SCHEMA: "lwdbo"

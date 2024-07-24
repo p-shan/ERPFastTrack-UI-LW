@@ -1,0 +1,119 @@
+@page
+@using ERPFastTrack.Abstraction.AbstractClass;
+@using ERPFastTrack.Common.Operations;
+@model ManageOrgModel
+@{
+	ViewData["Title"] = "Manage Organization";
+	var roleManager = Utils.GetService<OrgRoleManagerAbstract>(HttpContext);
+
+}
+@section VendorStyles {
+	<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/umd/styles/index.min.css" />
+	<link rel="stylesheet" href="~/vendor/libs/select2/select2.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/tagify/tagify.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/animate-css/animate.dist.css" />
+}
+
+@section VendorScripts {
+	<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.dist.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/bundle/popular.min.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-bootstrap5/index.min.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-auto-focus/index.min.js"></script>
+	<script src="~/vendor/libs/select2/select2.dist.js"></script>
+	<script src="~/vendor/libs/tagify/tagify.dist.js"></script>
+	<script src="~/vendor/libs/bootstrap-select/bootstrap-select.dist.js"></script>
+	<script src="~/vendor/libs/typeahead-js/typeahead.dist.js"></script>
+	<script src="~/vendor/libs/bloodhound/bloodhound.dist.js"></script>
+}
+
+@section PageScripts {
+	<script src="~/js/app-manage-organization.dist.js"></script>
+	<script src="~/js/forms-selects.dist.js"></script>
+}
+@* ************** Content ************** *@
+<h4 class="mb-4">Manage Organization</h4>
+
+<!-- Permission Table -->
+@if (roleManager.IsOrgSelected)
+{
+	<div class="card">
+		<div class="card-datatable table-responsive">
+			<table id="dtManageOrganization" class="datatables-query-configuration table border-top">
+				<thead>
+					<tr>
+						<th></th>
+						<th></th>
+						<th>Email</th>
+						<th>Name</th>
+						<th>Role</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+}
+else
+{
+	<div class="alert alert-primary alert-dismissible" role="alert">
+		<h5 class="alert-heading mb-2">Please select an Organization!</h5>
+		<p class="mb-0">You will need to select an organization first in order to proceed with this page.</p>
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+		</button>
+	</div>
+}
+
+<!-- Modal -->
+<div class="modal fade" id="mdlAddManageOrganization" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content p-3 p-md-5">
+			<button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+			<div class="modal-body">
+				<div class="text-center mb-4">
+					<h3 class="mb-2">Add User to Organization</h3>
+					<p class="text-muted">Here you can add a new user to the organization.</p>
+				</div>
+
+				<form id="frmAddManageOrganization" method="post" class="row" autocomplete="off">
+					<div class="col-md-12">
+						<div class="mb-3 form-field">
+							<label class="form-label" for="Name">Name</label>
+							<input type="text" name="Name" class="form-control" placeholder="Name" />
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="mb-3 form-field">
+							<label class="form-label" for="EmailId">Email</label>
+							<input type="email" name="EmailId" class="form-control" placeholder="Email" />
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="mb-3 form-field">
+							<label class="form-label" for="UserPassword">Password</label>
+							<input type="password" name="UserPassword" class="form-control" placeholder="Password" />
+						</div>
+					</div>
+					<div class="col-12 mb-3 form-field">
+						<label class="form-label" for="OrgRole">Role</label>
+						<select id="selOrgRole" name="OrgRole" class="select2 form-select form-select-lg" data-allow-clear="true">
+							<option></option>
+							<option value="4">Executor</option>
+							<option value="3">Editor</option>
+						</select>
+					</div>
+					<div class="col-12 text-center demo-vertical-spacing">
+						<button type="submit" class="btn btn-primary me-sm-3 me-1">Add Configuration</button>
+						<button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Discard</button>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+</div>
+<!-- /Modal -->

@@ -1,0 +1,243 @@
+@page
+@using ERPFastTrack.Abstraction.AbstractClass;
+@using ERPFastTrack.Common.Operations;
+@model SalesforceConfigModel
+@{
+	ViewData["Title"] = "Salesforce Connections";
+	var roleManager = Utils.GetService<OrgRoleManagerAbstract>(HttpContext);
+}
+
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.dist.css">
+    <link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.dist.css">
+    <link rel="stylesheet" href="~/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.dist.css">
+    <link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/umd/styles/index.min.css" />
+    <link rel="stylesheet" href="~/vendor/libs/select2/select2.dist.css" />
+    <link rel="stylesheet" href="~/vendor/libs/tagify/tagify.dist.css" />
+    <link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/animate-css/animate.dist.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.dist.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/umd/bundle/popular.min.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/umd/plugin-bootstrap5/index.min.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/umd/plugin-auto-focus/index.min.js"></script>
+    <script src="~/vendor/libs/select2/select2.dist.js"></script>
+    <script src="~/vendor/libs/tagify/tagify.dist.js"></script>
+    <script src="~/vendor/libs/bootstrap-select/bootstrap-select.dist.js"></script>
+    <script src="~/vendor/libs/typeahead-js/typeahead.dist.js"></script>
+	<script src="~/vendor/libs/bloodhound/bloodhound.dist.js"></script>
+}
+
+@section PageScripts {
+    <script src="~/js/app-salesforce-connections.dist.js"></script>
+}
+
+@* ************** Content ************** *@
+<h4 class="mb-4">Salesforce Connections</h4>
+
+<!-- Permission Table -->
+@if (roleManager.IsOrgSelected)
+{
+    <div class="card">
+        <div class="card-datatable table-responsive">
+            <table id="dtSalesforceConnection" class="datatables-salesforce-connection table border-top">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                        <th>Name</th>
+                        <th>URL</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+}
+else
+{
+    <div class="alert alert-primary alert-dismissible" role="alert">
+        <h5 class="alert-heading mb-2">Please select an Organization!</h5>
+        <p class="mb-0">You will need to select an organization first in order to proceed with this page.</p>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+        </button>
+    </div>
+}
+<!-- Modal -->
+<div class="modal fade" id="mdlAddSalesforceConnection" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content p-3 p-md-5">
+			<button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+			<div class="modal-body">
+				<div class="text-center mb-4">
+					<h3 class="mb-2">Add New Salesforce Connection</h3>
+					<p class="text-muted">Here you can create a new Salesforce connection with essential connection details.</p>
+				</div>
+				<form id="frmAddSalesforceConnection" method="post" class="row" autocomplete="off">
+					<div class="col-md-12">
+						<div class="mb-3 form-field">
+							<label class="form-label" for="connectionName">Connection Name</label>
+							<input type="text" name="Name" class="form-control" placeholder="Connection Name" />
+						</div>
+						<div class="mb-3 form-field">
+							<label class="form-label" for="connectionURL">Connection URL</label>
+							<input type="text" name="Url" class="form-control" placeholder="Connection URL" />
+						</div>
+					</div>
+					<div class="accordion mt-2" id="accordionM2M">
+						<div class="card accordion-item">
+							<h2 class="accordion-header" id="headingOne">
+								<button type="button" class="accordion-button" data-bs-toggle="collapse" data-bs-target="#accordionOne" aria-expanded="false" aria-controls="accordionOne">
+									<i class="me-2 ti ti-route"></i>
+									Machine to machine settings
+								</button>
+							</h2>
+
+							<div id="accordionOne" class="accordion-collapse collapse" data-bs-parent="#accordionM2M">
+								<div class="accordion-body">
+									<div class="mb-3 form-field">
+										<label class="form-label" for="tokenEndpointURL">Token Endpoint URL</label>
+										<input type="text" name="TokenEndpoint" class="form-control" placeholder="Token Endpoint URL" />
+									</div>
+									<div class="row">
+										<div class="col-md-6">
+											<div class="mb-3 form-field">
+												<label class="form-label" for="Username">Username</label>
+												<input type="text" name="Username" class="form-control" placeholder="Username" autocomplete="one-time-code" />
+											</div>
+											<div class="mb-3 form-field">
+												<label class="form-label" for="Password">Password</label>
+												<input type="password" name="Password" class="form-control" placeholder="Password" autocomplete="one-time-code" />
+											</div>
+										</div>
+
+										<div class="col-md-6">
+											<div class="mb-3 form-field">
+												<label class="form-label" for="clientId">Client ID</label>
+												<input type="text" name="ClientId" class="form-control" placeholder="Client ID" />
+											</div>
+											<div class="mb-3 form-field">
+												<label class="form-label" for="clientSecret">Client Secret</label>
+												<input type="text" name="ClientSecret" class="form-control" placeholder="Client Secret" />
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-12 text-center demo-vertical-spacing">
+						<button type="submit" class="btn btn-primary me-sm-3 me-1">Add Connection</button>
+						<button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Discard</button>
+					</div>
+				</form>
+
+
+			</div>
+		</div>
+	</div>
+</div>
+<!-- /Modal -->
+
+												
+<!-- Modal -->
+<div class="modal fade" id="mdlEditSalesforceConnection" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <h3 class="mb-2">Edit Salesforce Connection</h3>
+                    <p class="text-muted">Here you can edit an existing Salesforce connection with essential connection details.</p>
+                </div>
+				<form id="frmEditSalesforceConnection" method="post" class="row" autocomplete="off">
+					<div class="col-md-12">
+                        <div class="mb-3 form-field">
+                            <label class="form-label" for="connectionName">Connection Name</label>
+                            <input type="text" name="Name" class="form-control" placeholder="Connection Name" />
+                        </div>
+                        <div class="mb-3 form-field">
+                            <label class="form-label" for="connectionURL">Connection URL</label>
+                            <input type="text" name="Url" class="form-control" placeholder="Connection URL" />
+                        </div>
+                    </div>
+                    <div class="nav-align-top mb-4">
+                        <ul class="nav nav-pills mb-2" role="tablist">
+                            <li class="nav-item" role="presentation">
+                                <button type="button" class="nav-link active" role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-m2m" aria-controls="navs-pills-top-m2m" aria-selected="false" tabindex="-1">Machine to Machine</button>
+                            </li>
+                            <li class="nav-item mb-2" role="presentation">
+                                <button type="button" class="nav-link " role="tab" data-bs-toggle="tab" data-bs-target="#navs-pills-top-oauth" aria-controls="navs-pills-top-oauth" aria-selected="true">OAuth</button>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade active show" id="navs-pills-top-m2m" role="tabpanel">
+                                <div class="mb-3 form-field">
+                                    <label class="form-label" for="tokenEndpointURL">Token Endpoint URL</label>
+                                    <input type="text" name="TokenEndpoint" class="form-control" placeholder="Token Endpoint URL" />
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="mb-3 form-field">
+                                            <label class="form-label" for="Username">Username</label>
+                                            <input type="text" name="Username" class="form-control" placeholder="Username" autocomplete="one-time-code" />
+                                        </div>
+                                        <div class="mb-3 form-field">
+                                            <label class="form-label" for="Password">Password</label>
+                                            <input type="password" name="Password" class="form-control" placeholder="Password" autocomplete="one-time-code" />
+                                        </div>
+                                    </div>
+
+                                    <div class="col-md-6">
+                                        <div class="mb-3 form-field">
+                                            <label class="form-label" for="clientId">Client ID</label>
+                                            <input type="text" name="ClientId" class="form-control" placeholder="Client ID" />
+                                        </div>
+                                        <div class="mb-3 form-field">
+                                            <label class="form-label" for="clientSecret">Client Secret</label>
+                                            <input type="text" name="ClientSecret" class="form-control" placeholder="Client Secret" />
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="tab-pane fade" id="navs-pills-top-oauth" role="tabpanel">
+                                @*<div class="alert alert-success" id="connectionAlert" role="alert">
+                                    Token expiry: <span id="tokenExpirySpan"></span>.
+                                </div>*@
+								<div class="alert alert-info" id="connectionAlert" role="alert">
+									<strong>Token is generated. </strong>If you are facing any issues then re-login to salesforce or provide M2M configurations.
+								</div>
+                                <div class="col-md-6">
+                                    <div class="form-field">
+                                        <button id="salesforceSubmitBtn" class="btn btn-info">Connect to Salesforce</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <input type="hidden" name="id" id="editSalesforceConnectionId" />
+                    <div class="col-12 text-center demo-vertical-spacing">
+                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Edit Connection</button>
+                        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Discard</button>
+                    </div>
+                </form>
+                <script>
+                    document.addEventListener('DOMContentLoaded', function () {
+                        document.getElementById('salesforceSubmitBtn').addEventListener('click', function (event) {
+                            event.preventDefault();
+                            var form = document.getElementById('frmEditSalesforceConnection');
+                            form.action = '/api/SalesforceAuth/AuthorizeSalesforce';
+                            form.submit();
+                        });
+                    });
+                </script>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal -->

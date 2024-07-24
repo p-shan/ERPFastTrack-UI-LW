@@ -1,0 +1,66 @@
+@{
+	Layout = "/Pages/Layouts/_CommonMasterLayout.cshtml";
+	ViewData["navbarType"] = (ViewData["navbarType"] ?? "layout-navbar-fixed");
+  ViewData["isFront"] = (ViewData["isFront"] ??= true);
+}
+
+@section VendorStyles { @RenderSection("VendorStyles", required: false) }
+
+@section PageStyles { @RenderSection("PageStyles", required: false) }
+
+
+<!-- Navbar -->
+@await Html.PartialAsync("/Pages/Layouts/Sections/Navbar/_NavbarFront.cshtml")
+<!-- / Navbar -->
+
+@RenderBody()
+
+<!-- Footer -->
+@await Html.PartialAsync("/Pages/Layouts/Sections/Footer/_FooterFront.cshtml")
+<!-- / Footer -->
+
+@section VendorScripts { @RenderSection("VendorScripts", required: false) }
+
+@section PageScripts { @RenderSection("PageScripts", required: false) }
+<environment include="Development">
+	<script src="~/vendor/libs/jquery/jquery.dist.js"></script>
+	<script src="~/vendor/libs/popper/popper.dist.js"></script>
+	<script src="~/vendor/js/bootstrap.dist.js"></script>
+	<!-- `perfect-scrollbar` library required by SideNav plugin -->
+	<script src="~/vendor/libs/perfect-scrollbar/perfect-scrollbar.dist.js"></script>
+	<!-- node-waves required for animation on button click -->
+	<script src="~/vendor/libs/node-waves/node-waves.dist.js"></script>
+	<!-- `hammer` required for swipe guesture -->
+	<script src="~/vendor/libs/hammer/hammer.dist.js"></script>
+	<!-- `i18n` required for translation -->
+	<script src="~/vendor/libs/i18n/i18n.dist.js"></script>
+	<!-- `typeahead` required for search fn -->
+	<script src="~/vendor/libs/typeahead-js/typeahead.dist.js"></script> <!-- `typeahead` required for sideNav -->
+	<script src="~/vendor/js/menu.dist.js"></script>
+	<script src="~/js/site.dist.js"></script>
+</environment>
+
+<environment exclude="Development">
+	<script src="~/vendor/libs/jquery/jquery.dist.js" asp-append-version="true"></script>
+	<script src="~/vendor/libs/popper/popper.dist.js" asp-append-version="true"></script>
+	<script src="~/vendor/js/bootstrap.dist.js" asp-append-version="true"></script>
+	<script src="~/vendor/libs/perfect-scrollbar/perfect-scrollbar.dist.js" asp-append-version="true"></script>
+	<script src="~/vendor/libs/node-waves/node-waves.dist.js"></script>
+	<script src="~/vendor/libs/hammer/hammer.dist.js" asp-append-version="true"></script>
+	<script src="~/vendor/libs/i18n/i18n.dist.js" asp-append-version="true"></script>
+	<script src="~/vendor/libs/typeahead-js/typeahead.dist.js" asp-append-version="true"></script>
+	<script src="~/vendor/js/menu.dist.js" asp-append-version="true"></script>
+	<script src="~/js/site.dist.js" asp-append-version="true"></script>
+</environment>
+
+<script src="~/vendor/libs/moment/moment.dist.js"></script>
+<script src="~/vendor/libs/jquery-sticky/jquery-sticky.dist.js"></script>
+<script src="~/vendor/libs/block-ui/block-ui.dist.js"></script>
+<script src="~/vendor/libs/sweetalert2/sweetalert2.dist.js"></script>
+<script src='~/vendor/libs/handlebars/handlebars.js'></script>
+<script src="~/vendor/libs/select2/select2.dist.js"></script>
+<script src="~/vendor/libs/timeago/jquery.timeago.js"></script>
+<script src="~/vendor/libs/toastr/toastr.dist.js"></script>
+<script src='~/js/forms-selects.dist.js'></script>
+<script src='~/js/app-global.dist.js'></script>
+

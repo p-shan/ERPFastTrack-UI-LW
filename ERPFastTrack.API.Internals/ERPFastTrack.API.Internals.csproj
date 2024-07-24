@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+	<ItemGroup>
+		<FrameworkReference Include="Microsoft.AspNetCore.App" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\ERPFastTrack.Abstraction\ERPFastTrack.Abstraction.csproj" />
+	  <ProjectReference Include="..\ERPFastTrack.APIModels\ERPFastTrack.APIModels.csproj" />
+	  <ProjectReference Include="..\ERPFastTrack.DBGround\ERPFastTrack.DBGround.csproj" />
+	  <ProjectReference Include="..\ERPFastTrack.DBProcessor\ERPFastTrack.DBProcessor.csproj" />
+	  <ProjectReference Include="..\ERPFastTrack.SalesforceProcessor\ERPFastTrack.SalesforceProcessor.csproj" />
+	  <ProjectReference Include="..\ERPFastTrack.SourceProcessor\ERPFastTrack.SourceProcessor.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="AutoMapper" Version="12.0.1" />
+	  <PackageReference Include="Cronos" Version="0.8.2" />
+	  <PackageReference Include="CsvHelper" Version="31.0.4" />
+	  <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+	  <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="7.5.1" />
+	</ItemGroup>
+
+    <!--<ItemGroup>
+        <PackageReference Include="ArmDot.Client" Version="2024.6.0" />
+        <PackageReference Include="ArmDot.Engine.MSBuildTasks" Version="2024.6.0" />
+    </ItemGroup>
+
+    
+    <Target Name="Protect" AfterTargets="AfterCompile" BeforeTargets="BeforePublish">
+        <ItemGroup>
+            <Assemblies Include="$(ProjectDir)$(IntermediateOutputPath)$(TargetFileName)" />
+        </ItemGroup>
+        <ArmDot.Engine.MSBuildTasks.ObfuscateTask
+          Inputs="@(Assemblies)"
+          ReferencePaths="@(_ResolveAssemblyReferenceResolvedFiles->'%(RootDir)%(Directory)')"
+          SkipAlreadyObfuscatedAssemblies="true"
+  />
+    </Target>-->
+</Project>

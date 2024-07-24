@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    </ItemGroup>
+
+    <!--<ItemGroup>
+        <PackageReference Include="ArmDot.Client" Version="2024.6.0" />
+        <PackageReference Include="ArmDot.Engine.MSBuildTasks" Version="2024.6.0" />
+    </ItemGroup>
+
+    <Target Name="Protect" AfterTargets="AfterCompile" BeforeTargets="BeforePublish">
+        <ItemGroup>
+            <Assemblies Include="$(ProjectDir)$(IntermediateOutputPath)$(TargetFileName)" />
+        </ItemGroup>
+        <ArmDot.Engine.MSBuildTasks.ObfuscateTask
+          Inputs="@(Assemblies)"
+          ReferencePaths="@(_ResolveAssemblyReferenceResolvedFiles->'%(RootDir)%(Directory)')"
+          SkipAlreadyObfuscatedAssemblies="true"
+  />
+    </Target>-->
+</Project>

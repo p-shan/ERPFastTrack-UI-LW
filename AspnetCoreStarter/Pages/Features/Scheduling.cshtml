@@ -1,0 +1,401 @@
+@page
+@using ERPFastTrack.Abstraction.AbstractClass;
+@using ERPFastTrack.Common.Operations;
+@model AspnetCoreStarter.Pages.Features.SchedulingModel
+@{
+    ViewData["Title"] = "Scheduling";
+    var roleManager = Utils.GetService<OrgRoleManagerAbstract>(HttpContext);
+}
+
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.dist.css">
+    <link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.dist.css">
+    <link rel="stylesheet" href="~/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.dist.css">
+    <link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/umd/styles/index.min.css" />
+    <link rel="stylesheet" href="~/vendor/libs/select2/select2.dist.css" />
+    <link rel="stylesheet" href="~/vendor/libs/tagify/tagify.dist.css" />
+    <link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.dist.css" />
+    <link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.dist.css" />
+    <link rel="stylesheet" href="~/vendor/libs/animate-css/animate.dist.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.dist.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/umd/bundle/popular.min.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/umd/plugin-bootstrap5/index.min.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/umd/plugin-auto-focus/index.min.js"></script>
+    <script src="~/vendor/libs/select2/select2.dist.js"></script>
+    <script src="~/vendor/libs/tagify/tagify.dist.js"></script>
+    <script src="~/vendor/libs/bootstrap-select/bootstrap-select.dist.js"></script>
+    <script src="~/vendor/libs/typeahead-js/typeahead.dist.js"></script>
+    <script src="~/vendor/libs/bloodhound/bloodhound.dist.js"></script>
+    <script src="~/vendor/libs/sortablejs/sortable.dist.js"></script>
+}
+
+@section PageScripts {
+    <script src="~/js/app-scheduling.dist.js"></script>
+}
+
+@* ************** Content ************** *@
+<h4 class="mb-4">Job Scheduling</h4>
+
+<!-- Projects Section -->
+<div class="card" id="hbsOutersectionProjects">
+</div>
+
+<!-- Schedules Section -->
+<div class="my-4 card" id="hbsOutersectionSchedules">
+</div>
+
+<!-- Jobs Details Section -->
+<div id="hbsOutersectionSchedulingDetails">
+</div>
+
+
+<!-- Add Job Modal -->
+<div class="modal fade" id="mdlAddJobSchedule" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-md modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <h3 class="mb-2">Add job to schedule</h3>
+                    <p class="text-muted">Here you can add a job to create a schedule.</p>
+                </div>
+                <form id="frmAddJobSchedule" method="post" class="row" autocomplete="off">
+                    <div class="col-md-12">
+                        <div class="mb-3">
+                            <label class="form-label" for="jobList">Job List</label>
+                            <select id="selJobs" class="form-select form-select-lg form-control" name="Jobs" data-allow-clear="true" placeholder="Jobs">
+                                <option></option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-12 text-center demo-vertical-spacing">
+                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Add Job</button>
+                        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Discard</button>
+                    </div>
+                </form>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal -->
+
+<script id="hbsProjects" type="text/x-handlebars-template">
+    <div class="card" id="hbsInnersectionProjects">
+        <h5 class="card-header">Select Project</h5>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-xl-6 mb-4">
+                    <select id="selProjects" class="form-select form-select-lg form-control" name="Projects" data-allow-clear="true" placeholder="Projects">
+                        <option></option>
+                    </select>
+                </div>
+                <div class="col-xl-6 mb-4">
+                    <button type="button" id="btnLoadSchedules" class="btn btn-primary">Load Schedules</button>
+                </div>
+            </div>
+            <button type="button" id="btnClearJobs" class="btn btn-label-dark waves-effect">Clear</button>
+        </div>
+    </div>
+</script>
+
+
+<script id="hbsSchedules" type="text/x-handlebars-template">
+    <div class="card-datatable table-responsive" id="hbsInnersectionSchedules">
+        <h5 class="card-header">Schedules in {{data}} Project</h5>
+
+            <div class="card-body">
+                <table id="dtSchedules" class="datatables-schedules table border-top">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th>Name</th>
+                            <th>Jobs</th>
+                            <th>Schedule Type</th>
+                            <th>Active</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+    </div>
+</script>
+
+<script id="hbsJobDetail" type="text/x-handlebars-template">
+    <div class="col-sm-12 mb-3 divJobDetails divJobDetail{{index}}" data-jobdet-index="{{Index}}" data-jobid="{{Id}}" data-jobname="{{JobName}}" data-dbtblname="{{SourceName}}" data-sfobjname="{{DestName}}">
+        <div class="card bg-label-primary text-primary ">
+            <div class="card-body">
+                <button type="button" class="btn rounded-pill btn-icon btn-danger float-end"  onclick="deleteJob(this)">
+                    <span class="ti ti-trash"></span>
+                </button>
+                <div class="row">
+                    <div class="col-sm-6 d-flex align-items-center">
+                        <i class="ti ti-menu-2"></i>
+                        <h4 class="card-title text-primary mb-0 ms-3">{{JobName}}</h4>
+                    </div>
+                    <div class="col-sm-3 d-flex align-items-center">
+                        <span class="text-truncate d-flex align-items-center" style="font-size: large;">                           
+							{{#if (eq ProjectTypeId 1)}}
+							<span class="badge badge-center rounded-pill bg-primary w-px-30 h-px-30 me-2">
+								<i class="fa-solid fa-database fa-2x fa-fw"></i>
+							</span>
+							<span class="text-primary">{{SourceName}}</span>
+							{{else if (eq ProjectTypeId 2)}}
+							<span class="badge badge-center rounded-pill bg-warning w-px-30 h-px-30 me-2">
+								<i class="fa-solid fa-file fa-2x fa-fw"></i>
+							</span>
+							<span class="text-warning">{{SourceName}}</span>
+							{{/if}}
+                        </span>
+                    </div>
+                    <div class="col-sm-3 d-flex align-items-center">
+                        <span class="text-truncate d-flex align-items-center" style="font-size: large;">
+							{{#if (eq DestinationTypeId 1)}}
+							<span class="badge badge-center rounded-pill bg-info w-px-30 h-px-30 me-2">
+								<i class="fa-brands fa-salesforce fa-2x fa-fw"></i>
+							</span>
+							<span class="text-info">{{DestName}}</span>
+							{{/if}}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script id="hbsSchedulingDetails" type="text/x-handlebars-template">
+    <div id="hbsInnersectionSchedulingDetails">
+        <div class="px-4 card sticky-element">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+
+                <div class="d-flex flex-column justify-content-center">
+                    <h4 class="mb-1 mt-3">Add a new Schedule</h4>
+                    <p class="text-muted">Fill the required information to create the schedule</p>
+                </div>
+                <div class="d-flex align-content-center flex-wrap gap-3">
+                    <div class="d-flex gap-3">
+                        <button id="btnDiscardSchedule" class="btn btn-label-secondary waves-effect" fdprocessedid="zd74p5">Discard</button>
+                        <button id="btnSaveSchedule" class="btn btn-success waves-effect" fdprocessedid="tolheh">Save Schedule</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="px-4 mt-4">
+            <h5 class="py-3 my-3"><span class="text-muted fw-light">Schedule /</span> Jobs</h5>
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card card-action">
+                        <div class="card-header">
+                            <div class="card-action-title"><h5>Prioritize jobs</h5></div>
+                            <div class="card-action-element">
+                                <ul class="list-inline mb-0">
+                                    <li class="list-inline-item">
+                                        <button type="button" id="btnLoadJobs" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#mdlAddJobSchedule">Add Job</button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-12 col-12 mb-md-0 mb-4">
+                                    <p>Set the jobs priority by dragging them in the correct order</p>
+
+                                    <div class="row" id="sortable-4">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h5 class="py-3 my-3"><span class="text-muted fw-light">Schedule /</span> Scheduling Details</h5>
+
+            <div id="schedulingDetails" class="my-4 card">
+                <div class="card-body">
+
+            <label class="switch mb-2 switch-success switch-lg">
+                <h5 class="switch-label">Active</h5>
+                <input id="chkbxIsActive" name="IsActive" type="checkbox" class="switch-input" />
+                <span class="switch-toggle-slider">
+                <span class="switch-on">
+                  <i class="ti ti-check"></i>
+                </span>
+                <span class="switch-off">
+                  <i class="ti ti-x"></i>
+                </span>
+              </span>
+            </label>
+                    <div class="row">
+                        <div class="col-md-3 col-12 mb-3">
+                            <label class="form-label" for="ScheduleName">Schedule Name</label>
+                            <input type="text" name="ScheduleName" id="txtScheduleName" class="form-control" placeholder="Schedule Name" />
+                        </div>
+                        <div class="col-md-3 col-12 mb-md-0 mb-4">
+                            <div class="mb-3">
+                                <label class="form-label" for="schedultType">Schedule Type</label>
+                                <select id="selScheduleType" class="select2 form-select form-select-lg" data-allow-clear="true">
+                                    <option></option>
+                                    <option value="1">Immediately</option>
+                                    <option value="2">Hourly</option>
+                                    <option value="3">Daily</option>
+                                    <option value="4">Monthly</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="divStartDate" class="col-md-3 col-12 mb-3">
+                            <label class="form-label" for="StartDate">Schedule Start Date</label>
+                            <input id="txtStartDate" type="date" name="StartDate" class="form-control" placeholder="Start Date" />
+                        </div>
+
+                        <div id="divEndDate" class="col-md-3 col-12 mb-3">
+                            <label class="form-label" for="EndDate">Schedule End Date</label>
+                            <input id="txtEndDate" type="date" name="EndDate" class="form-control" placeholder="End Date" />
+                        </div>
+                    </div>
+                    <div id="divScheduleExtraDivider" class="divider divider-dashed">
+                      <div class="divider-text">
+                        Additional Schedule Details
+                      </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-3 col-12 mb-3">
+
+                        </div>
+                        <div id="divDaily" class="col-md-3 col-12 mb-3">
+                            <label class="form-label" for="DailyTime">Select Time</label>
+                            <input id="txtDailyTime" type="time" name="DailyTime" class="form-control" placeholder="Daily Time" />
+                        </div>
+
+                        <div id="divMonthlyDay" class="col-md-3 col-12 mb-3">
+                            <label class="form-label" for="MonthDay">Month Day</label>
+                            <select id="selMonthDay" class="select2 form-select form-select-lg" data-allow-clear="true">
+                                <option></option>
+                                <option value="1">1</option>
+                                <option value="2">2</option>
+                                <option value="3">3</option>
+                                <option value="4">4</option>
+                                <option value="5">5</option>
+                                <option value="6">6</option>
+                                <option value="7">7</option>
+                                <option value="8">8</option>
+                                <option value="9">9</option>
+                                <option value="10">10</option>
+                                <option value="11">11</option>
+                                <option value="12">12</option>
+                                <option value="13">13</option>
+                                <option value="14">14</option>
+                                <option value="15">15</option>
+                                <option value="16">16</option>
+                                <option value="17">17</option>
+                                <option value="18">18</option>
+                                <option value="19">19</option>
+                                <option value="20">20</option>
+                                <option value="21">21</option>
+                                <option value="22">22</option>
+                                <option value="23">23</option>
+                                <option value="24">24</option>
+                                <option value="25">25</option>
+                                <option value="26">26</option>
+                                <option value="27">27</option>
+                                <option value="28">28</option>
+                            </select>
+                        </div>
+
+                        <div id="divMonthlyTime" class="col-md-3 col-12 mb-3">
+                            <label class="form-label" for="MonthTime">Day Time</label>
+                            <input id="txtMonthTime" type="time" name="MonthTime" class="form-control" placeholder="Month" />
+                        </div>
+
+                        <div id="divHourlyMinute" class="col-md-3 col-12 mb-3">
+                            <label class="form-label" for="EndDate">Hourly Minute</label>
+                            <select id="selHourlyMinute" class="select2 form-select form-select-lg" data-allow-clear="true">
+                                    <option></option>
+                                    <option value="0">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                    <option value="6">6</option>
+                                    <option value="7">7</option>
+                                    <option value="8">8</option>
+                                    <option value="9">9</option>
+                                    <option value="10">10</option>
+                                    <option value="11">11</option>
+                                    <option value="12">12</option>
+                                    <option value="13">13</option>
+                                    <option value="14">14</option>
+                                    <option value="15">15</option>
+                                    <option value="16">16</option>
+                                    <option value="17">17</option>
+                                    <option value="18">18</option>
+                                    <option value="19">19</option>
+                                    <option value="20">20</option>
+                                    <option value="21">21</option>
+                                    <option value="22">22</option>
+                                    <option value="23">23</option>
+                                    <option value="24">24</option>
+                                    <option value="25">25</option>
+                                    <option value="26">26</option>
+                                    <option value="27">27</option>
+                                    <option value="28">28</option>
+                                    <option value="29">29</option>
+                                    <option value="30">30</option>
+                                    <option value="31">31</option>
+                                    <option value="32">32</option>
+                                    <option value="33">33</option>
+                                    <option value="34">34</option>
+                                    <option value="35">35</option>
+                                    <option value="36">36</option>
+                                    <option value="37">37</option>
+                                    <option value="38">38</option>
+                                    <option value="39">39</option>
+                                    <option value="40">40</option>
+                                    <option value="41">41</option>
+                                    <option value="42">42</option>
+                                    <option value="43">43</option>
+                                    <option value="44">44</option>
+                                    <option value="45">45</option>
+                                    <option value="46">46</option>
+                                    <option value="47">47</option>
+                                    <option value="48">48</option>
+                                    <option value="49">49</option>
+                                    <option value="50">50</option>
+                                    <option value="51">51</option>
+                                    <option value="52">52</option>
+                                    <option value="53">53</option>
+                                    <option value="54">54</option>
+                                    <option value="55">55</option>
+                                    <option value="56">56</option>
+                                    <option value="57">57</option>
+                                    <option value="58">58</option>
+                                    <option value="59">59</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</script>
+
+<script id="hbsJobTags" type="text/x-handlebars-template">
+    <ul class="list-group list-group-timeline">
+        {{#each this}}
+        <li class="list-group-item list-group-timeline-primary">{{name}}</li>
+        {{/each}}
+    </ul>
+    <!--span class="badge rounded-pill bg-label-success me-1">{{name}}</span-->
+</script>

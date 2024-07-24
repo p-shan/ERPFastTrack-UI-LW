@@ -1,0 +1,65 @@
+@page
+@model SFGenTok
+@{
+    ViewData["Title"] = "DB Connections";
+}
+
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.dist.css">
+    <link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.dist.css">
+    <link rel="stylesheet" href="~/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.dist.css">
+    <link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/umd/styles/index.min.css" />
+    <link rel="stylesheet" href="~/vendor/libs/select2/select2.dist.css" />
+    <link rel="stylesheet" href="~/vendor/libs/tagify/tagify.dist.css" />
+    <link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/animate-css/animate.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/sweetalert2/sweetalert2.dist.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.dist.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/umd/bundle/popular.min.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/umd/plugin-bootstrap5/index.min.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/umd/plugin-auto-focus/index.min.js"></script>
+    <script src="~/vendor/libs/select2/select2.dist.js"></script>
+    <script src="~/vendor/libs/tagify/tagify.dist.js"></script>
+    <script src="~/vendor/libs/bootstrap-select/bootstrap-select.dist.js"></script>
+    <script src="~/vendor/libs/typeahead-js/typeahead.dist.js"></script>
+	<script src="~/vendor/libs/bloodhound/bloodhound.dist.js"></script>
+	<script src="~/vendor/libs/sweetalert2/sweetalert2.dist.js"></script>
+}
+
+@section PageScripts {
+    <script src="~/js/app-salesforce-connections.dist.js"></script>
+    <script src="~/js/modal-add-salesforce-connection.dist.js"></script>
+    <script src="~/js/modal-edit-salesforce-connection.dist.js"></script>
+	<script src="~/js/forms-selects.dist.js"></script>
+	<script src="~/js/extended-ui-sweetalert2.dist.js"></script>
+}
+
+@* ************** Content ************** *@
+<h4 class="mb-4">Salesforce Connections</h4>
+
+<!-- Permission Table -->
+<div class="card">
+    <div class="card-datatable table-responsive">
+        <table class="datatables-permissions table border-top">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+                    <th>Name</th>
+                    <th>URL</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<!--/ Permission Table -->
+<!-- Modal -->
+@await Html.PartialAsync("../_Partials/_Modals/ModalAddSalesforceConnection")
+@await Html.PartialAsync("../_Partials/_Modals/ModalEditSalesforceConnection")
+<!-- /Modal -->

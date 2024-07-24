@@ -1,0 +1,217 @@
+@page
+@using AspnetCoreStarter.Areas.Identity.Pages.Account;
+@model RegisterModel
+@{
+	Layout = "/Pages/Layouts/_BlankLayout.cshtml";
+
+	ViewData["Title"] = "Register";
+}
+
+@section VendorStyles {
+	<!-- Vendor -->
+	<link rel="stylesheet" href="~/vendor/libs/bs-stepper/bs-stepper.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/select2/select2.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/umd/styles/index.min.css" />
+}
+
+@section VendorScripts {
+	<script src="~/vendor/libs/cleavejs/cleave.dist.js"></script>
+	<script src="~/vendor/libs/cleavejs/cleave-phone.dist.js"></script>
+	<script src="~/vendor/libs/bs-stepper/bs-stepper.dist.js"></script>
+	<script src="~/vendor/libs/select2/select2.dist.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/bundle/popular.min.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-bootstrap5/index.min.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-auto-focus/index.min.js"></script>
+}
+
+@section PageStyles {
+	<link rel="stylesheet" href="~/vendor/css/pages/page-auth.dist.css">
+}
+
+@section PageScripts {
+	<script src="~/js/pages-auth-multisteps.dist.js"></script>
+}
+@* ************** Content ************** *@
+
+<div class="authentication-wrapper authentication-cover authentication-bg">
+	<div class="authentication-inner row">
+
+		<!-- Left Text -->
+		<div class="d-none d-lg-flex col-lg-4 align-items-center justify-content-center p-5 auth-cover-bg-color position-relative auth-multisteps-bg-height">
+			<img src="~/img/illustrations/auth-register-multisteps-illustration.png" alt="auth-register-multisteps" class="img-fluid" width="280">
+		</div>
+		<!-- /Left Text -->
+		<!--  Multi Steps Registration -->
+		<div class="d-flex col-lg-8 align-items-center justify-content-center p-sm-5 p-3">
+			<div class="w-px-700">
+				<div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+				<div id="multiStepsValidationRegister" class="bs-stepper shadow-none">
+					<div class="bs-stepper-header border-bottom-0">
+						<div class="step" data-target="#accountDetailsValidation">
+							<button type="button" class="step-trigger">
+								<span class="bs-stepper-circle"><i class="ti ti-smart-home ti-sm"></i></span>
+								<span class="bs-stepper-label">
+									<span class="bs-stepper-title">Account</span>
+									<span class="bs-stepper-subtitle">Account Details</span>
+								</span>
+							</button>
+						</div>
+						<div class="line">
+							<i class="ti ti-chevron-right"></i>
+						</div>
+						<div class="step" data-target="#organizationInfoValidation">
+							<button type="button" class="step-trigger">
+								<span class="bs-stepper-circle"><i class="ti ti-users ti-sm"></i></span>
+								<span class="bs-stepper-label">
+									<span class="bs-stepper-title">Create Organization</span>
+									<span class="bs-stepper-subtitle">Enter Information</span>
+								</span>
+							</button>
+						</div>
+					</div>
+					<div class="bs-stepper-content">
+						<form id="multiStepsForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+							<!-- Account Details -->
+							<div id="accountDetailsValidation" class="content">
+								<div class="content-header mb-4">
+									<h3 class="mb-1">Account Information</h3>
+									<p>Enter Your Account Details</p>
+								</div>
+								<div class="row g-3">
+									<div class="col-sm-6">
+										<label class="form-label" for="multiStepsFullName">Full Name</label>
+										<input asp-for="Input.FullName" id="multiStepsFullName" class="form-control" placeholder="firstname lastname" />
+									</div>
+									<div class="col-sm-6">
+										<label class="form-label" for="multiStepsEmail">Email</label>
+										<input asp-for="Input.Email" id="multiStepsEmail" class="form-control" placeholder="abc@example.com" aria-label="example" />
+									</div>
+									<div class="col-sm-6 form-password-toggle">
+										<label class="form-label" for="multiStepsPass">Password</label>
+										<div class="input-group input-group-merge">
+											<input asp-for="Input.Password" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="multiStepsPass2" />
+											<span class="input-group-text cursor-pointer" id="multiStepsPass2"><i class="ti ti-eye-off"></i></span>
+										</div>
+									</div>
+									<div class="col-sm-6 form-password-toggle">
+										<label class="form-label" for="multiStepsConfirmPass">Confirm Password</label>
+										<div class="input-group input-group-merge">
+											<input id="multiStepsConfirmPass" asp-for="Input.ConfirmPassword" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="multiStepsConfirmPass2" />
+											<span class="input-group-text cursor-pointer" id="multiStepsConfirmPass2"><i class="ti ti-eye-off"></i></span>
+										</div>
+									</div>
+									<div class="col-12 d-flex justify-content-between mt-4">
+										<button class="btn btn-label-secondary btn-prev" disabled>
+											<i class="ti ti-arrow-left ti-xs me-sm-1 me-0"></i>
+											<span class="align-middle d-sm-inline-block d-none">Previous</span>
+										</button>
+										<button type="button" class="btn btn-primary btn-next"> <span class="align-middle d-sm-inline-block d-none me-sm-1 me-0">Next</span> <i class="ti ti-arrow-right ti-xs"></i></button>
+									</div>
+								</div>
+							</div>
+							<!-- Organization Info -->
+							<div id="organizationInfoValidation" class="content">
+								<div class="content-header mb-4">
+									<h3 class="mb-1">Organization Information</h3>
+									<p>Enter Your Organization Information</p>
+								</div>
+								<div class="row g-3">
+									<div class="col-sm-12">
+										@* <label class="form-label" for="multiStepsOrgName">Organization Name <span class="badge rounded-pill bg-label-primary">Optional</span></label> *@
+										<input type="text" id="multiStepsOrgName" asp-for="Input.OrgName" class="form-control" placeholder="Org Name" />
+									</div>
+									<div class="col-12 d-flex justify-content-between mt-4">
+										<button type="button" class="btn btn-label-secondary btn-prev">
+											<i class="ti ti-arrow-left ti-xs me-sm-1 me-0"></i>
+											<span class="align-middle d-sm-inline-block d-none">Previous</span>
+										</button>
+										@* <div class="d-flex align-items-center">skip if not required</div> *@
+										<button type="button" id="frmSubmit" class="btn btn-success btn-next btn-submit">Submit</button>
+									</div>
+								</div>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</div>
+		<!-- / Multi Steps Registration -->
+	</div>
+</div>
+
+<script>
+	// Check selected custom option
+	window.Helpers.initCustomOptionCheck();
+</script>
+
+
+@*@page
+@using AspnetCoreStarter.Areas.Identity.Pages.Account;
+@model RegisterModel
+@{
+    ViewData["Title"] = "Register";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
+            <h2>Create a new account.</h2>
+            <hr />
+            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
+                <label asp-for="Input.Email">Email</label>
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                <label asp-for="Input.Password">Password</label>
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <div class="form-floating mb-3">
+                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
+                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>
+            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+        </form>
+    </div>
+    <div class="col-md-6 col-md-offset-2">
+        <section>
+            <h3>Use another service to register.</h3>
+            <hr />
+            @{
+                if ((Model.ExternalLogins?.Count ?? 0) == 0)
+                {
+                    <div>
+                        <p>
+                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
+                            about setting up this ASP.NET application to support logging in via external services</a>.
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
+                        <div>
+                            <p>
+                                @foreach (var provider in Model.ExternalLogins!)
+                                {
+                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                                }
+                            </p>
+                        </div>
+                    </form>
+                }
+            }
+        </section>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
+*@

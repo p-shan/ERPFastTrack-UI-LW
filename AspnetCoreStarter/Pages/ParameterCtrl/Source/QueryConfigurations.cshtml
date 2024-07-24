@@ -1,0 +1,139 @@
+@page
+@using ERPFastTrack.Abstraction.AbstractClass;
+@using ERPFastTrack.Common.Operations;
+@model QueryConfigurationsModel
+@{
+	ViewData["Title"] = "Query Configurations";
+	var roleManager = Utils.GetService<OrgRoleManagerAbstract>(HttpContext);
+
+}
+@section VendorStyles {
+	<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/umd/styles/index.min.css" />
+	<link rel="stylesheet" href="~/vendor/libs/select2/select2.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/tagify/tagify.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/animate-css/animate.dist.css" />
+}
+
+@section VendorScripts {
+	<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.dist.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/bundle/popular.min.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-bootstrap5/index.min.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-auto-focus/index.min.js"></script>
+	<script src="~/vendor/libs/select2/select2.dist.js"></script>
+	<script src="~/vendor/libs/tagify/tagify.dist.js"></script>
+	<script src="~/vendor/libs/bootstrap-select/bootstrap-select.dist.js"></script>
+	<script src="~/vendor/libs/typeahead-js/typeahead.dist.js"></script>
+	<script src="~/vendor/libs/bloodhound/bloodhound.dist.js"></script>
+}
+
+@section PageScripts {
+	<script src="~/js/app-query-configurations.dist.js"></script>
+	<script src="~/js/forms-selects.dist.js"></script>
+}
+@* ************** Content ************** *@
+<h4 class="mb-4">Query Configuration</h4>
+
+<!-- Permission Table -->
+@if (roleManager.IsOrgSelected)
+{
+	<div class="card">
+		<div class="card-datatable table-responsive">
+			<table id="dtQueryConfiguration" class="datatables-query-configuration table border-top">
+				<thead>
+					<tr>
+						<th></th>
+						<th></th>
+						<th>Name</th>
+						<th>Details</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+}
+else
+{
+	<div class="alert alert-primary alert-dismissible" role="alert">
+		<h5 class="alert-heading mb-2">Please select an Organization!</h5>
+		<p class="mb-0">You will need to select an organization first in order to proceed with this page.</p>
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+		</button>
+	</div>
+}
+
+<!-- Modal -->
+<div class="modal fade" id="mdlAddQueryConfiguration" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content p-3 p-md-5">
+			<button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+			<div class="modal-body">
+				<div class="text-center mb-4">
+					<h3 class="mb-2">Add New Query Configuration</h3>
+					<p class="text-muted">Here you can create a new Query with configuration details.</p>
+				</div>
+
+				<form id="frmAddQueryConfiguration" method="post" class="row" autocomplete="off">
+					<div class="col-md-12">
+						<div class="mb-3 form-field">
+							<label class="form-label" for="QueryName">Query Name</label>
+							<input type="text" name="QueryName" class="form-control" placeholder="Query Name" />
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="mb-3 form-field">
+							<label class="form-label" for="QueryDetails">Query Details</label>
+							@Html.TextArea("QueryDetails", "", new { @type = "text", @placeholder = "Query Details", @name = "QueryDetails", @class = "form-control" })
+						</div>
+					</div>
+					<div class="col-12 text-center demo-vertical-spacing">
+						<button type="submit" class="btn btn-primary me-sm-3 me-1">Add Configuration</button>
+						<button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Discard</button>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="mdlEditQueryConfiguration" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content p-3 p-md-5">
+            <button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+            <div class="modal-body">
+                <div class="text-center mb-4">
+                    <h3 class="mb-2">Edit Query Configuration</h3>
+                    <p class="text-muted">Here you can edit an existing Query Configuration with essential details.</p>
+                </div>
+
+				<form id="frmEditQueryConfiguration" method="post" class="row" autocomplete="off">
+                    <div class="col-md-12">
+                        <div class="mb-3 form-field">
+							<label class="form-label" for="QueryName">Query Name</label>
+							<input type="text" name="QueryName" class="form-control" placeholder="Query Name" />
+						</div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="mb-3 form-field">
+							<label class="form-label" for="QueryDetails">Query Details</label>
+							@Html.TextArea("QueryDetails", "", new { @type = "text", @placeholder = "Query Details", @name = "QueryDetails", @class = "form-control" })
+						</div>                        
+                    </div>                    
+                    <input type="hidden" name="id" id="editQueryConfigurationId" />
+                    <div class="col-12 text-center demo-vertical-spacing">
+                        <button type="submit" class="btn btn-primary me-sm-3 me-1">Edit Configuration</button>
+                        <button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Discard</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /Modal -->

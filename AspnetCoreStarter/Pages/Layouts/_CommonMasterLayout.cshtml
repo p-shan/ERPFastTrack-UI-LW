@@ -1,0 +1,104 @@
+@using ERPFastTrack.Common.Static;
+
+@{
+	@* using this variables to load front pages assets *@
+	bool isFront = ViewData["isFront"] != null && Convert.ToBoolean(ViewData["isFront"]);
+	ViewData["main"] = (isFront) ? "front-" : "";
+	ViewData["frontVar"] = (isFront) ? "Front" : "";
+	@* Compact/Fluid class *@
+	ViewData["contentType"] = (ViewData["container"] == "container-xxl") ? "layout-compact" : "layout-wide";
+}
+@{
+	//TempData["appName"] = "ERPFastTrack UI";
+	TempData["appName"] = "ERPFastTrack";
+	TempData["appUrl"] = "#";
+	@* Footer & Misc urls *@
+	TempData["authorName"] = "ERPFastTrack";
+	TempData["authorUrl"] = "#";
+	TempData["licenseUrl"] = "#";
+	TempData["productPage"] =
+	"#";
+	TempData["support"] = "#";
+	TempData["documentation"] = "#";
+	TempData["twitterUrl"] = "#";
+	TempData["instagramUrl"] = "#";
+	TempData["githubFreeUrl"] = "#";
+	TempData["facebookUrl"] = "#";
+}
+
+
+@*@await Html.PartialAsync("/Pages/Layouts/Sections/_Variables.cshtml")*@
+@inject IHttpContextAccessor httpContextAccessor
+
+<!DOCTYPE html>
+<html lang="en" class='light-style @ViewData["navbarType"] @ViewData["menuFixed"] @ViewData["menuCollapsed"] @ViewData["contentType"] @ViewData["footerFixed"] @ViewData["customizerHidden"]' dir="ltr" data-theme="theme-default" data-assets-path='@(httpContextAccessor.HttpContext.Request.PathBase + "/")' data-template='@((Convert.ToBoolean(@TempData.Peek("menuHorizontal")).ToString() == "True") ? "horizontal-menu-template" : "vertical-menu-template")'>
+
+<head>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
+
+	<title>@ViewData["title"] | @GlobalVariables.AppName</title>
+	<meta name="description" content="" />
+
+	<!-- Canonical SEO -->
+	<link rel="canonical" href='@TempData.Peek("productPage")'>
+	<!-- Favicon -->
+	<link rel="icon" type="image/x-icon" href="~/img/favicon/favicon.ico" />
+	<style>
+		.auto-height .select2-results__options {
+			max-height: 400px !important; /* Use 100% of the viewport height */
+			overflow-y: auto !important; /* Enable vertical scrolling */
+		}
+	</style>
+	<!-- Core Styles -->
+	@await Html.PartialAsync("/Pages/Layouts/Sections/_Styles" + ViewData["frontVar"]+".cshtml")
+
+
+	<!-- Vendor Styles -->
+	@RenderSection("VendorStyles", required: false)
+	<link rel="stylesheet" href="~/vendor/libs/select2/select2.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/sweetalert2/sweetalert2.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/spinkit/spinkit.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/toastr/toastr.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/animate-css/animate.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/jsonviewer/jquery.json-viewer.css">
+	<link rel="stylesheet" href="~/vendor/libs/driver/driver.css">
+
+	<!-- Page Styles -->
+	@RenderSection("PageStyles", required: false)
+
+	<!-- Include Scripts for customizer, helper, analytics, config -->
+	@await Html.PartialAsync("/Pages/Layouts/Sections/_ScriptsIncludes" + ViewData["frontVar"]+".cshtml")
+</head>
+
+<body>
+	<!-- Layout Content -->
+	@RenderBody()
+	<!--/ Layout Content -->
+	<!-- Core Scripts -->
+	@await Html.PartialAsync("/Pages/Layouts/Sections/_Scripts" + ViewData["frontVar"]+".cshtml")
+
+	<!-- Vendor Scripts -->
+	@RenderSection("VendorScripts", required: false)
+
+	<script src='~/js/@ViewData["main"]main.dist.js'></script>
+	<script src="~/vendor/libs/moment/moment.dist.js"></script>
+	<script src="~/vendor/libs/jquery-sticky/jquery-sticky.dist.js"></script>
+	<script src="~/vendor/libs/block-ui/block-ui.dist.js"></script>
+	<script src="~/vendor/libs/sweetalert2/sweetalert2.dist.js"></script>
+	<script src='~/vendor/libs/handlebars/handlebars.js'></script>
+	<script src='~/vendor/libs/jsonviewer/jquery.json-viewer.js'></script>
+    <script src="~/vendor/libs/select2/select2.dist.js"></script>
+	<script src="~/vendor/libs/timeago/jquery.timeago.js"></script>
+	<script src="~/vendor/libs/toastr/toastr.dist.js"></script>
+	<script src='~/vendor/libs/driver/driver.js'></script>
+	<script src='~/js/forms-selects.dist.js'></script>
+	<script src='~/js/app-global.dist.js'></script>
+
+	<!-- Page Scripts-->
+	@RenderSection("PageScripts", required: false)
+
+
+</body>
+
+</html>

@@ -1,0 +1,231 @@
+@page
+@using ERPFastTrack.Abstraction.AbstractClass;
+@using ERPFastTrack.Common.Operations;
+@model DBConnectionsModel
+@{
+	ViewData["Title"] = "DB Connections";
+	var roleManager = Utils.GetService<OrgRoleManagerAbstract>(HttpContext);
+}
+
+
+@section VendorStyles {
+	<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/umd/styles/index.min.css" />
+	<link rel="stylesheet" href="~/vendor/libs/select2/select2.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/tagify/tagify.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/animate-css/animate.dist.css" />
+}
+
+@section VendorScripts {
+	<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.dist.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/bundle/popular.min.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-bootstrap5/index.min.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-auto-focus/index.min.js"></script>
+	<script src="~/vendor/libs/select2/select2.dist.js"></script>
+	<script src="~/vendor/libs/tagify/tagify.dist.js"></script>
+	<script src="~/vendor/libs/bootstrap-select/bootstrap-select.dist.js"></script>
+	<script src="~/vendor/libs/typeahead-js/typeahead.dist.js"></script>
+	<script src="~/vendor/libs/bloodhound/bloodhound.dist.js"></script>
+}
+
+@section PageScripts {
+	<script src="~/js/app-database-connections.dist.js"></script>
+}
+
+@* ************** Content ************** *@
+<h4 class="mb-4">Database Connections</h4>
+
+<!-- Permission Table -->
+@if (roleManager.IsOrgSelected)
+{
+<div class="card">
+	<div class="card-datatable table-responsive">
+		<table id="dtDatabaseConnection" class="datatables-permissions table border-top">
+			<thead>
+				<tr>
+					<th></th>
+					<th></th>
+					<th>Connection Name</th>
+					<th>Connection String</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+</div>
+}
+else
+{
+<div class="alert alert-primary alert-dismissible" role="alert">
+	<h5 class="alert-heading mb-2">Please select an Organization!</h5>
+	<p class="mb-0">You will need to select an organization first in order to proceed with this page.</p>
+	<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+	</button>
+</div>
+}
+
+<div class="offcanvas offcanvas-end w-75" data-bs-scroll="true" id="ocEditQueryConfiguration" tabindex="-1" aria-labelledby="ocEditQueryConfigurationLabel">
+	<div class="offcanvas-header">
+		<h5 id="ocEditQueryConfigurationLabel" class="offcanvas-title">Edit Query Configuration</h5>
+		<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+	</div>
+	<div class="offcanvas-body mx-0 flex-grow-0">
+		<form id="frmEditQueryConfiguration" method="post" class="row" autocomplete="off">
+			<div class="col-md-12">
+				<div class="mb-3 form-field">
+					<label class="form-label" for="queryName">Query Name</label>
+					<input type="text" name="queryName" class="form-control" placeholder="Query Name" />
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="mb-3 form-field">
+					<label class="form-label" for="queryDetails">Query Details</label>
+					@Html.TextArea("queryDetails", "", new { @type = "text", @placeholder = "Query Details", @name = "queryDetails", @class = "form-control" })
+				</div>
+			</div>
+			<input type="hidden" name="id" id="editQueryConfigurationId" />
+			<div class="col-12 text-center demo-vertical-spacing">
+				<button type="submit" class="btn btn-success waves-effect waves-light">Save</button>
+				<button type="button" class="btn btn-label-secondary waves-effect" data-bs-dismiss="offcanvas">Cancel</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div class="offcanvas offcanvas-end w-75" data-bs-scroll="true" id="ocAddQueryConfiguration" tabindex="-1" aria-labelledby="ocAddQueryConfigurationLabel">
+	<div class="offcanvas-header">
+		<h5 id="ocAddQueryConfigurationLabel" class="offcanvas-title">Add Query Configuration</h5>
+		<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+	</div>
+	<div class="offcanvas-body mx-0 flex-grow-0">
+		<form id="frmAddQueryConfiguration" method="post" class="row" autocomplete="off">
+			<div class="col-md-12">
+				<div class="mb-3 form-field">
+					<label class="form-label" for="queryName">Query Name</label>
+					<input type="text" name="queryName" class="form-control" placeholder="Query Name" />
+				</div>
+			</div>
+			<div class="col-md-12">
+				<div class="mb-3 form-field">
+					<label class="form-label" for="queryDetails">Query Details</label>
+					@Html.TextArea("queryDetails", "", new { @type = "text", @placeholder = "Query Details", @name = "queryDetails", @class = "form-control" })
+				</div>
+			</div>
+			<div class="col-12 text-center demo-vertical-spacing">
+				<button type="submit" class="btn btn-success waves-effect waves-light">Save</button>
+				<button type="button" class="btn btn-label-secondary waves-effect" data-bs-dismiss="offcanvas">Cancel</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade modal-xl" id="mdlEditDatabaseConnection" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content p-3 p-md-5">
+			<button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+			<div class="modal-body">
+				<div class="text-center mb-4">
+					<h3 class="mb-2">Edit Database Connection</h3>
+					<p class="text-muted">Here you can edit an existing Database connection with essential connection details.</p>
+				</div>
+
+				<form id="frmEditDatabaseConnection" method="post" class="row" autocomplete="off">
+					<div class="col-md-12">
+						<div class="mb-3 form-field">
+							<label class="form-label" for="connectionName">Connection Name</label>
+							<input type="text" name="Name" class="form-control" placeholder="Connection Name" />
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="mb-3 form-field">
+							<label class="form-label" for="connectionString">Connection String</label>
+							@Html.TextArea("ConnectionString", "", new { @type = "text", @placeholder = "Connection String", @name = "ConnectionString", @class = "form-control" })
+							@* <input type="text" name="ConnectionUrl" class="form-control" placeholder="Connection URL" rows="10"/> *@
+							<button type="button" id="btnEdtTestConnection" class="btn btn-sm btn-success me-sm-3 mt-1">Test Connection</button>
+						</div>
+					</div>
+
+					<div class="container pt-2 pb-2 border border-secondary rounded">
+						<h4>Query Configurations</h4>
+						<table id="dtEditQueryConfiguration" class="table border-top">
+							<thead>
+								<tr>
+									<th>Query Name</th>
+									<th>Query String</th>
+									<th>Action</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+
+					<input type="hidden" name="id" id="editDatabaseConnectionId" />
+					<div class="col-12 text-center demo-vertical-spacing">
+						<button type="submit" class="btn btn-primary me-sm-3 me-1">Edit Connection</button>
+						<button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Discard</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- /Modal -->
+<!-- Modal -->
+<div class="modal fade modal-xl" id="mdlAddDatabaseConnection" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content p-3 p-md-5">
+			<button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+			<div class="modal-body">
+				<div class="text-center mb-4">
+					<h3 class="mb-2">Add New Database Connection</h3>
+					<p class="text-muted">Here you can create a new Database connection with essential connection details.</p>
+				</div>
+
+				<form id="frmAddDatabaseConnection" method="post" class="row" autocomplete="off">
+					<div class="col-md-12">
+						<div class="mb-3 form-field">
+							<label class="form-label" for="connectionName">Connection Name</label>
+							<input type="text" name="Name" class="form-control" placeholder="Connection Name" />
+						</div>
+					</div>
+					<div class="col-md-12">
+						<div class="mb-3 form-field">
+							<label class="form-label" for="connectionString">Connection String</label>
+							@Html.TextArea("ConnectionString", "", new { @type = "text", @placeholder = "Connection String", @name = "ConnectionString", @class = "form-control" })
+							@* <input type="text" name="ConnectionUrl" class="form-control" placeholder="Connection URL" /> *@
+							<button type="button" id="btnAddTestConnection" class="btn btn-sm btn-success me-sm-3 mt-2">Test Connection</button>
+						</div>
+					</div>
+
+					<div class="container pt-2 pb-2 border border-secondary rounded">
+						<h4>Query Configurations</h4>
+						<table id="dtAddQueryConfiguration" class="table border-top">
+							<thead>
+								<tr>
+									<th>Query Name</th>
+									<th>Query String</th>
+									<th>Action</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+					</div>
+
+					<div class="col-12 text-center demo-vertical-spacing">
+						<button type="submit" class="btn btn-primary me-sm-3 me-1">Add Connection</button>
+						<button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Discard</button>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->

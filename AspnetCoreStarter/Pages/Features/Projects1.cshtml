@@ -1,0 +1,236 @@
+@page
+@using ERPFastTrack.Abstraction.AbstractClass;
+@using ERPFastTrack.Common.Operations;
+@model ProjectsModel
+@{
+	ViewData["Title"] = "Projects";
+	var roleManager = Utils.GetService<OrgRoleManagerAbstract>(HttpContext);
+}
+
+
+@section VendorStyles {
+	<link rel="stylesheet" href="~/vendor/libs/bs-stepper/bs-stepper.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/umd/styles/index.min.css" />
+	<link rel="stylesheet" href="~/vendor/libs/select2/select2.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/tagify/tagify.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/animate-css/animate.dist.css" />
+}
+
+@section VendorScripts {
+	<script src="~/vendor/libs/bs-stepper/bs-stepper.dist.js"></script>
+	<script src="~/vendor/libs/cleavejs/cleave.dist.js"></script>
+	<script src="~/vendor/libs/cleavejs/cleave-phone.dist.js"></script>
+	<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.dist.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/bundle/popular.min.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-bootstrap5/index.min.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-auto-focus/index.min.js"></script>
+	<script src="~/vendor/libs/select2/select2.dist.js"></script>
+	<script src="~/vendor/libs/tagify/tagify.dist.js"></script>
+	<script src="~/vendor/libs/bootstrap-select/bootstrap-select.dist.js"></script>
+	<script src="~/vendor/libs/typeahead-js/typeahead.dist.js"></script>
+	<script src="~/vendor/libs/bloodhound/bloodhound.dist.js"></script>
+	<script src="~/vendor/libs/flatpickr/flatpickr.dist.js"></script>
+}
+
+@section PageScripts {
+	<script src="~/js/app-projects.dist.js"></script>
+	<script src="~/js/wizard-ex-property-listing.dist.js"></script>
+}
+
+@* ************** Content ************** *@
+<h4 class="mb-4">Projects</h4>
+
+@if (roleManager.IsOrgSelected)
+{
+	<!-- Projects Table -->
+	<div class="card">
+		<div class="card-datatable table-responsive">
+			<table id="dtProject" class="datatables-projects table border-top">
+				<thead>
+					<tr>
+						<th></th>
+						<th></th>
+						<th>Name</th>
+						<th>Source Type</th>
+						<th>Destination Type</th>
+						<th>Source Name</th>
+						<th>Destination Name</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+
+	<!-- Projects Table -->
+	<!-- Add Prject Modal -->
+	<div class="modal fade modal-xl" id="mdlAddProject" tabindex="-1" aria-hidden="true">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content p-3 p-md-5">
+				<button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+				<div class="modal-body">
+					<div class="text-center mb-4">
+						<h3 class="mb-2">Add New Project</h3>
+						<p class="text-muted">Here you can create a new project.</p>
+					</div>
+
+					<form id="frmAddProject" method="post" class="row" autocomplete="off">
+
+						<!-- Property Listing Wizard -->
+						<div id="wzdAddProject" class="bs-stepper vertical mt-2">
+							<div class="bs-stepper-header">
+								<div class="step" data-target="#wzdAddProjectForm1">
+									<button type="button" class="step-trigger">
+										<span class="bs-stepper-circle"><i class="ti ti-users ti-sm"></i></span>
+										<span class="bs-stepper-label">
+											<span class="bs-stepper-title">Project Basic Details</span>
+											<span class="bs-stepper-subtitle">Source & Destination</span>
+										</span>
+									</button>
+								</div>
+								<div class="line"></div>
+								<div class="step" data-target="#wzdAddProjectForm2">
+									<button type="button" class="step-trigger">
+										<span class="bs-stepper-circle"><i class="ti ti-home ti-sm"></i></span>
+										<span class="bs-stepper-label">
+											<span class="bs-stepper-title">Source - Target</span>
+											<span class="bs-stepper-subtitle">Define Connections</span>
+										</span>
+									</button>
+								</div>
+							</div>
+							<div class="bs-stepper-content">
+								<div id="wzdAddProjectForm" onSubmit="return false">
+
+									<!-- Project Type -->
+									<div id="wzdAddProjectForm1" class="content">
+										<div class="row g-3">
+											<div class="col-md-12">
+												<div class="mb-3 form-field">
+													<label class="form-label" for="Name">Project Name</label>
+													<input type="text" name="Name" class="form-control" placeholder="Project Name" />
+												</div>
+											</div>
+
+											<h5>Select Source</h5>
+											<div class="row">
+												<div class="col-12">
+													<div class="row pb-2">
+														<div class="col-md-4 mb-md-0 mb-2">
+															<div class="form-check custom-option custom-option-icon">
+																<label class="form-check-label custom-option-content" for="rbSrcDatabase">
+																	<i class="fa-solid fa-database fa-2x fa-fw"></i>
+																	<span class="custom-option-body mt-1">
+																		<span class="custom-option-title"> Database </span>
+																		@*<small>Source will be the records present in the tables in the database.</small>*@
+																	</span>
+																	<input name="Source" class="form-check-input" type="radio" value="1" id="rbSrcDatabase" required />
+																</label>
+															</div>
+														</div>
+														<div class="col-md-4 mb-md-0 mb-2">
+															<div class="form-check custom-option custom-option-icon">
+																<label class="form-check-label custom-option-content" for="rbSrcFilesource">
+																	<i class="fa-solid fa-server fa-2x fa-fw"></i>
+																	<span class="custom-option-body mt-1">
+																		<span class="custom-option-title"> File Source </span>
+																		@*<small>Source will be the files stored in the Shared File Location.</small>*@
+																	</span>
+																	<input name="Source" class="form-check-input" type="radio" value="2" id="rbSrcFilesource" required />
+																</label>
+															</div>
+														</div>
+														@*<div class="col-md-4 mb-md-0 mb-2">
+															<div class="form-check custom-option custom-option-icon">
+																<label class="form-check-label custom-option-content" for="rbSrcUploadfile">
+																	<i class="fa-solid fa-file-csv fa-2x fa-fw"></i>
+																	<span class="custom-option-body mt-1">
+																		<span class="custom-option-title"> Upload Single CSV </span>
+																	</span>
+																	<input name="Source" class="form-check-input" type="radio" value="3" id="rbSrcUploadfile" required />
+																</label>
+															</div>
+														</div>*@
+													</div>
+												</div>
+											</div>
+
+											<h5>Select Destination</h5>
+											<div class="row">
+												<div class="col-12">
+													<div class="row pb-2">
+														<div class="col-md-4 mb-md-0 mb-2">
+															<div class="form-check custom-option custom-option-icon">
+																<label class="form-check-label custom-option-content" for="rbDestSalesforce">
+																	<i class="fa-brands fa-salesforce fa-2x fa-fw"></i>
+																	<span class="custom-option-body mt-1">
+																		<span class="custom-option-title"> Salesforce </span>
+																		@*<small>Source will be the records present in the tables.</small>*@
+																	</span>
+																	<input name="Destination" class="form-check-input" type="radio" value="1" id="rbDestSalesforce" required />
+																</label>
+															</div>
+														</div>
+													</div>
+												</div>
+												<div class="col-12 d-flex justify-content-between mt-4">
+													<button class="btn btn-label-secondary btn-prev" disabled>
+														<i class="ti ti-arrow-left ti-xs me-sm-1 me-0"></i>
+														<span class="align-middle d-sm-inline-block d-none">Previous</span>
+													</button>
+													<div class="btn btn-primary btn-next"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Next</span> <i class="ti ti-arrow-right ti-xs"></i></div>
+												</div>
+											</div>
+										</div>
+
+									</div>
+
+									<!-- Source Details -->
+									<div id="wzdAddProjectForm2" class="content">
+										<div class="row g-3">
+											<div class="col-sm-12">
+												<label class="form-label" for="SrcDetails" id="lblSrcDetails"></label>
+												<select id="selSourceDetails" class="select2 form-select" name="SrcDetails" data-allow-clear="true" placeholder="">
+													<option></option>
+												</select>
+											</div>
+											<hr />
+											<div class="col-sm-12 mt-0">
+												<label class="form-label" for="DestDetails" id="lblDestDetails"></label>
+												<select id="selDestDetails" class="select2 form-select" name="DestDetails" data-allow-clear="true" placeholder="">
+													<option></option>
+												</select>
+											</div>
+
+											<div class="col-12 d-flex justify-content-between mt-4">
+												<div class="btn btn-label-secondary btn-prev"> <i class="ti ti-arrow-left ti-xs me-sm-1 me-0"></i> <span class="align-middle d-sm-inline-block d-none">Previous</span> </div>
+												<div class="btn btn-success btn-next"> <span class="align-middle d-sm-inline-block d-none me-sm-1">Create Project</span> <i class="ti ti-arrow-right ti-xs"></i></div>
+											</div>
+										</div>
+									</div>
+
+								</div>
+							</div>
+							<!--/ Property Listing Wizard -->
+						</div>
+					</form>
+
+				</div>
+			</div>
+		</div>
+	</div>
+}
+else
+{
+	<div class="alert alert-primary alert-dismissible" role="alert">
+		<h5 class="alert-heading mb-2">Please select an Organization!</h5>
+		<p class="mb-0">You will need to select an organization first in order to proceed with this page.</p>
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+		</button>
+	</div>
+}

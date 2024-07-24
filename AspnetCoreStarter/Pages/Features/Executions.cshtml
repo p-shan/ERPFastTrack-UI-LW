@@ -1,0 +1,422 @@
+@page
+@using ERPFastTrack.Abstraction.AbstractClass;
+@using ERPFastTrack.Common.Operations;
+@model AspnetCoreStarter.Pages.Features.ExecutionModel
+@{
+	ViewData["Title"] = "Executions";
+	var roleManager = Utils.GetService<OrgRoleManagerAbstract>(HttpContext);
+}
+
+@section VendorStyles {
+	<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/umd/styles/index.min.css" />
+	<link rel="stylesheet" href="~/vendor/libs/select2/select2.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/tagify/tagify.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/animate-css/animate.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/apex-charts/apex-charts.dist.css" />
+}
+
+@section VendorScripts {
+	<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.dist.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/bundle/popular.min.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-bootstrap5/index.min.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-auto-focus/index.min.js"></script>
+	<script src="~/vendor/libs/select2/select2.dist.js"></script>
+	<script src="~/vendor/libs/tagify/tagify.dist.js"></script>
+	<script src="~/vendor/libs/bootstrap-select/bootstrap-select.dist.js"></script>
+	<script src="~/vendor/libs/typeahead-js/typeahead.dist.js"></script>
+	<script src="~/vendor/libs/bloodhound/bloodhound.dist.js"></script>
+	<script src="~/vendor/libs/sortablejs/sortable.dist.js"></script>
+	<script src="~/vendor/libs/apex-charts/apexcharts.dist.js"></script>
+	<script src="~/vendor/libs/chartjs/chartjs.dist.js"></script>
+}
+
+@section PageScripts {
+	<script src="~/js/app-executions.dist.js"></script>
+}
+
+@* ************** Content ************** *@
+<h4 class="mb-4">Job Execution</h4>
+
+<!-- Executions Section -->
+<div class="card" id="hbsOutersectionExecutions">
+</div>
+
+<!-- ExecutionDets Section -->
+<div id="hbsOutersectionExecutionDets">
+</div>
+
+<div class="modal fade" id="exLargeModal" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-fullscreen" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="detTitle"></h5>
+				<button type="button" class="btnExtDtModalClose btn-close" aria-label="Close"></button>
+			</div>
+			<div class="modal-body">
+				<div id="hbsOutersectionExecutionDetsTable">
+				</div>
+				<div id="hbsOutersectionExecutionDetsRecord">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btnExtDtModalClose btn btn-label-secondary">Close</button>
+			</div>
+
+		</div>
+	</div>
+</div>
+
+<script id="hbsExecutionDetsRecord" type="text/x-handlebars-template">
+	<div class="p-4" id="hbsInnersectionExecutionDetsRecord">
+		<h2 class="text-primary">Record Details</h2>
+		<div class="row">
+			<div class="col-md-3">
+				<h5>JSON Request</h5>
+				<pre class="border bg-light json-document" id="json-request"></pre>
+			</div>
+			<div class="col-md-3">
+				<h5>JSON Response</h5>
+				<pre class="border bg-light json-document" id="json-response"></pre>
+			</div>
+			<div class="col-md-6">
+				<h5>Try fixing? <span class="badge bg-warning">Coming Soon</span></h5>
+			</div>
+		</div>
+	</div>
+</script>
+
+<script id="hbsExecutionDetsTable" type="text/x-handlebars-template">
+	<div class="card-datatable table-responsive" id="hbsInnersectionExecutionDetsTable">
+		<table id="dtExecutionDets" class="datatables-executiondets table border-top">
+			<thead>
+				<tr>
+					<th></th>
+					<th></th>
+					<th>Salesforce Id</th>
+					<th>Details</th>
+					<th>Status</th>
+					<th>Message</th>
+					<th>MessageCode</th>
+					<th>Actions</th>
+				</tr>
+			</thead>
+		</table>
+	</div>
+</script>
+
+<script id="hbsExecutions" type="text/x-handlebars-template">
+	<div class="card-datatable table-responsive" id="hbsInnersectionExecutions">
+		<h5 class="card-header">Executions</h5>
+
+		<div class="card-body">
+			<table id="dtExecutions" class="datatables-executions table border-top">
+				<thead>
+					<tr>
+						<th></th>
+						<th></th>
+						<th>Schedule Name</th>
+						<th>Number of Jobs</th>
+						<th>Status</th>
+						<th>Scheduled at</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+</script>
+
+
+<script id="hbsExecutionDets" type="text/x-handlebars-template">
+	<div class="px-4 mt-4" id="ExecutionCardDetail" data-schedule-name="{{ScheduleName}}" data-schedule-status={{ScheduleStatus}} data-scheduled-at={{ScheduledAt}} data-number-of-jobs={{NumberOfJobs}} data-successful-jobs={{SuccessfulJobs}} data-failed-jobs={{FailedJobs}} data-time-spending={{TimeSpending}}>
+		<h5 class="py-3 my-3"><span class="text-muted fw-light">Executions /</span> Details</h5>
+		<div class="row mb-4">
+			<div class="col-12">
+				<div class="card card-action">
+					<div class="card-header pb-0 mb-2">
+						<div class="card-action-title"><h4>Execution Details</h4></div>
+										<div class="d-flex align-items-center gap-3 mb-3">
+											<div class="content-right">
+												<button type="button" class="btn btn-primary btn-sm waves-effect">
+													<i class="ti ti-history me-1"></i>
+													Execution History
+												</button>
+											</div>
+										</div>
+					</div>
+					<div class="card-body">
+						<div class="card bg-transparent shadow-none my-4 mt-0 border-0">
+							<div class="card-body row p-0">
+								<div class="col-12 col-md-8 card-separator">
+									<div class="d-flex justify-content-between flex-wrap gap-3 me-5">
+										<div class="d-flex align-items-center gap-3 me-4 me-sm-0">
+											<div class="content-right">
+												<p class="mb-0">Schedule Name</p>
+												<h4 class="text-primary mb-0">{{ScheduleName}}</h4>
+											</div>
+										</div>
+										<div class="d-flex align-items-center gap-3">
+											<div class="content-right">
+												<p class="mb-0">Scheduled At</p>
+												<h4 class="text-info mb-0">{{ScheduledAt}}</h4>
+											</div>
+										</div>
+										<div class="d-flex align-items-center gap-3">
+											<div class="content-right">
+												<p class="mb-0">Status</p>
+												{{#if (eq ScheduleStatus 1)}}
+													<span class="badge bg-label-secondary">Scheduled</span>
+												{{else if (eq ScheduleStatus 2)}}
+													<span class="badge bg-label-warning">In Progress</span>
+												{{else if (eq ScheduleStatus 3)}}
+													<span class="badge bg-label-success">Completed</span>
+												{{/if}}
+											</div>
+										</div>
+									</div>
+									<hr/>
+									<div class="mt-4 d-flex justify-content-between flex-wrap gap-3 me-5">
+										<div class="d-flex align-items-center gap-3 me-4 me-sm-0">
+											<span class="bg-label-primary p-2 rounded">
+												<i class='ti ti-number ti-xl'></i>
+											</span>
+											<div class="content-right">
+												<p class="mb-0">Total Jobs</p>
+												<h4 class="text-primary mb-0">{{NumberOfJobs}}</h4>
+											</div>
+										</div>
+										<div class="d-flex align-items-center gap-3">
+											<span class="bg-label-success p-2 rounded">
+												<i class='ti ti-checks ti-xl'></i>
+											</span>
+											<div class="content-right">
+												<p class="mb-0">Successful Jobs</p>
+												<h4 class="text-success mb-0">{{SuccessfulJobs}}</h4>
+											</div>
+										</div>
+										<div class="d-flex align-items-center gap-3">
+											<span class="bg-label-danger p-2 rounded">
+												<i class='ti ti-x ti-xl'></i>
+											</span>
+											<div class="content-right">
+												<p class="mb-0">Failed Jobs</p>
+												<h4 class="text-danger mb-0">{{FailedJobs}}</h4>
+											</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-12 col-md-4 ps-md-3 ps-lg-4 pt-3 pt-md-0">
+									<div class="d-flex justify-content-between align-items-center">
+										<div>
+											<div>
+												<h5 class="mb-2">Time Spendings</h5>
+												<p class="mb-5">Job wise</p>
+											</div>
+											<div class="time-spending-chart">
+												<h3 class="mb-2">{{TimeSpending}}<span class="text-muted"> seconds</span></h3>
+											</div>
+										</div>
+										<div id="leadsReportChart"></div>
+									</div>
+								</div>
+							</div>
+						</div>
+						<div class="row">
+							<div class="col-md-12 col-12 mb-md-0 mb-4">
+								<p>Please find the job details in selected schedule below</p>
+
+							</div>
+						</div>
+
+						<div id="divJobDetails"> </div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+</script>
+
+<script id="hbsExecutionJobDetails" type="text/x-handlebars-template">
+	<div class="accordion accordion-bordered p-2" id="accJobs" data-bs-toggle="sidebar" data-overlay="">
+		{{#each this}}<div class="accordion-item" id="jobItem-{{@@index}}">
+		<div class="accordion-header" id="accJobsHeader{{@@index}}">
+			<div role="button" class="accordion-button shadow-none align-items-center" data-bs-toggle="collapse"
+				data-bs-target="#accJobs{{@@index}}" aria-expanded="false" aria-controls="accJobs{{@@index}}">
+				<div class="d-flex align-items-center">
+					<div class="avatar-wrapper">
+						<div class="avatar avatar-md me-2">
+							<span class="avatar-initial rounded-circle bg-label-warning">{{Initial}}</span>
+						</div>
+					</div>
+					<span class="mx-2 d-flex flex-column">
+						<span class="h5  mb-0">{{JobName}}</span>
+						{{#if (eq JobStatus 'Completed')}}
+						<small><span class="mt-1 badge bg-label-success">Completed</span></small>
+						{{else if (eq JobStatus 'Failed')}}
+						<small><span class="mt-1 badge bg-label-danger">Failed</span></small>
+						{{/if}}
+					</span>
+				</div>
+			</div>
+		</div>
+		<div id="accJobs{{@@index}}" class="accordion-collapse collapse">
+			<div class="accordion-body pt-3 pb-0">
+				<div class="row">
+					<div class="col-lg-3 col-12 mb-4 card-separator">
+						<div class="card">
+							<div class="card-body">
+								<canvas id="doughnutChart{{@@index}}" class="chartjs mb-4"></canvas>
+								<ul class="doughnut-legend d-flex justify-content-around ps-0 mb-2 pt-1">
+									<li class="ct-series-0 d-flex flex-column">
+										<h5 class="mb-0">Success</h5>
+										<span class="badge badge-dot my-2 cursor-pointer rounded-pill"
+											style="background-color: rgb(40 199 111);width:35px; height:6px;"></span>
+										<div class="text-muted">{{SuccessPercent}} %</div>
+									</li>
+									<li class="ct-series-1 d-flex flex-column">
+										<h5 class="mb-0">Failure</h5>
+										<span class="badge badge-dot my-2 cursor-pointer rounded-pill"
+											style="background-color: #ea5455;width:35px; height:6px;"></span>
+										<div class="text-muted">{{FailurePercent}} %</div>
+									</li>
+								</ul>
+							</div>
+						</div>
+					</div>
+
+					<div class="col-lg-3 col-12 mb-4 card-separator">
+						<div class="d-flex align-items-center justify-content-center h-100 w-100">
+							<ul class="timeline ps-3 mt-4 mb-0"
+								style="width:fit-content !important; height:fit-content !important">
+								<li class="timeline-item ms-1 ps-4 border-left-dashed">
+									<span
+										class="timeline-indicator-advanced timeline-indicator-success border-0 shadow-none">
+										<i class="ti ti-circle-check"></i>
+									</span>
+									<div class="timeline-event ps-0 pb-0">
+										<div class="timeline-header">
+											<small class="text-success text-uppercase fw-medium">Job Created</small>
+										</div>
+										<p class="text-muted mb-0">{{JobCreatedTime}}</p>
+									</div>
+								</li>
+								<li class="timeline-item ms-1 ps-4 border-left-dashed">
+									<span
+										class="timeline-indicator-advanced timeline-indicator-success border-0 shadow-none">
+										<i class="ti ti-circle-check"></i>
+									</span>
+									<div class="timeline-event ps-0 pb-0">
+										<div class="timeline-header">
+											<small class="text-success text-uppercase fw-medium">Job Started</small>
+										</div>
+										<p class="text-muted mb-0">{{JobStartTime}}</p>
+									</div>
+								</li>
+								<li class="timeline-item ms-1 ps-4 border-transparent">
+									<span
+										class="timeline-indicator-advanced timeline-indicator-success border-0 shadow-none">
+										<i class="ti ti-circle-check"></i>
+									</span>
+									<div class="timeline-event ps-0 pb-0">
+										<div class="timeline-header">
+											<small class="text-success text-uppercase fw-medium">Job Completed</small>
+										</div>
+										<p class="text-muted mb-0">{{JobCompletionTime}}</p>
+									</div>
+								</li>
+							</ul>
+						</div>
+					</div>
+					<div class="col-lg-6 col-12 mb-4">
+						<div class="align-items-center justify-content-center h-100 w-100">
+							<div>
+								<div class="card">
+									<div class="card-body text-center">
+										{{#if JobObservations}}
+										<p class="card-text text-uppercase text-danger"><strong>Error Details</strong></p>
+										<p class="text-muted">{{JobObservations}}</p>
+										{{else}}
+										<p class="card-text text-uppercase text-primary"><strong>Execution Job Insights</strong></p>
+										<ul class="list-unstyled mb-0">
+											<li class="align-items-center mb-3"><i class="ti ti-check"></i><span
+													class="fw-bold mx-2">Processed Records :</span> <span>{{JobProcessedRecords}}</span>
+											</li>
+											<li class="align-items-center mb-3"><i class="ti ti-layout-grid"></i><span
+													class="fw-bold mx-2">Failed Records:</span> <span>{{JobFailedRecords}}</span></li>
+											<li class="align-items-center"><i class="ti ti-users"></i><span
+													class="fw-bold mx-2">External Id:</span> <span>{{ExternalId}}</span></li>
+										</ul>
+										{{/if}}
+
+										
+									</div>
+								</div>
+
+								<div class="card">
+
+									<div class="card-body">
+										<div class="row">
+											<div class="col-1">
+											</div>
+											{{#if (eq ProjectTypeId 1)}}
+											<div class="col-4">
+												<div class="d-flex gap-2 align-items-center mb-2">
+													<span class="badge bg-label-primary p-2 rounded"><i class="fa-solid fa-database fa-2x fa-fw"></i></span>
+													<p class="mb-0">Database</p>
+												</div>
+												<h5 class="mb-0 pt-1 text-nowrap">{{SourceDetName}}</h5>
+												<small class="text-muted">{{SourceName}}</small>
+											</div>
+											{{else if (eq ProjectTypeId 2)}}
+											<div class="col-4">
+												<div class="d-flex gap-2 align-items-center mb-2">
+													<span class="badge bg-label-warning p-2 rounded"><i class="fa-solid fa-file fa-2x fa-fw"></i></span>
+													<p class="mb-0">File</p>
+												</div>
+												<h5 class="mb-0 pt-1 text-nowrap">{{SourceDetName}}</h5>
+												<small class="text-muted">{{SourceName}}</small>
+											</div>
+											{{/if}}
+											<div class="col-2">
+												<div class="divider divider-vertical">
+													<div class="divider-text">
+														<span class="badge-divider-bg py-2 bg-label-warning"><span
+																class="ti ti-arrow-big-right-lines"></span></span>
+													</div>
+												</div>
+											</div>
+
+											{{#if (eq DestinationTypeId 1)}}
+											<div class="col-4 text-end">
+												<div class="d-flex gap-2 justify-content-end align-items-center mb-2">
+													<p class="mb-0">Salesforce</p>
+													<span class="badge bg-label-info p-2 rounded"><i class="fa-brands fa-salesforce fa-2x fa-fw"></i></span>
+												</div>
+												<h5 class="mb-0 pt-1 text-nowrap ms-lg-n3 ms-xl-0">{{DestDetName}}</h5>
+												<small class="text-muted">{{DestName}}</small>
+											</div>
+											{{/if}}
+											<div class="col-1">
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="d-grid gap-2 col-lg-6 mx-auto">
+								<button class="btnExploreDets btn btn-primary btn-lg btn-vimeo waves-effect waves-light" type="button" data-jobname={{JobName}} data-executiondetailid={{ExecutionDetailId}}> <i class="tf-icons ti ti-stack-pop ti-xs me-1"></i> Explore Details</button>
+							  </div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	{{/each}}
+	</div>
+</script>

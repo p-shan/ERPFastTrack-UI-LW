@@ -1,0 +1,155 @@
+@page
+@using ERPFastTrack.Abstraction.AbstractClass;
+@using ERPFastTrack.Common.Operations;
+@model SalesforceConfigModel
+@{
+	ViewData["Title"] = "Salesforce Connections";
+	var roleManager = Utils.GetService<OrgRoleManagerAbstract>(HttpContext);
+}
+
+
+@section VendorStyles {
+	<link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.dist.css">
+	<link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/umd/styles/index.min.css" />
+	<link rel="stylesheet" href="~/vendor/libs/select2/select2.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/tagify/tagify.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/animate-css/animate.dist.css" />
+}
+
+@section VendorScripts {
+	<script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.dist.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/bundle/popular.min.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-bootstrap5/index.min.js"></script>
+	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-auto-focus/index.min.js"></script>
+	<script src="~/vendor/libs/select2/select2.dist.js"></script>
+	<script src="~/vendor/libs/tagify/tagify.dist.js"></script>
+	<script src="~/vendor/libs/bootstrap-select/bootstrap-select.dist.js"></script>
+	<script src="~/vendor/libs/typeahead-js/typeahead.dist.js"></script>
+	<script src="~/vendor/libs/bloodhound/bloodhound.dist.js"></script>
+}
+
+@section PageScripts {
+	<script src="~/js/app-salesforce-db-mapping.dist.js"></script>
+}
+
+@* ************** Content ************** *@
+<h4 class="mb-4">Salesforce Connections</h4>
+
+<!-- Permission Table -->
+@if (roleManager.IsOrgSelected)
+{
+	<div class="card">
+		<div class="card-datatable table-responsive">
+			<table id="dtSalesforceDBMapping" class="datatables-salesforce-connection table border-top">
+				<thead>
+					<tr>
+						<th></th>
+						<th></th>
+						<th>Name</th>
+						<th>Salesforce Connection</th>
+						<th>Database Connection</th>
+						<th>Actions</th>
+					</tr>
+				</thead>
+			</table>
+		</div>
+	</div>
+}
+else
+{
+	<div class="alert alert-primary alert-dismissible" role="alert">
+		<h5 class="alert-heading mb-2">Please select an Organization!</h5>
+		<p class="mb-0">You will need to select an organization first in order to proceed with this page.</p>
+		<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+		</button>
+	</div>
+}
+<!-- Modal -->
+<div class="modal fade" id="mdlAddSalesforceDBMapping" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content p-3 p-md-5">
+			<button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+			<div class="modal-body">
+				<div class="text-center mb-4">
+					<h3 class="mb-2">Add New Salesforce DB Mapping</h3>
+					<p class="text-muted">Here you can create a new Salesforce Database Mapping.</p>
+				</div>
+				<form id="frmAddSalesforceDBMapping" method="post" class="row" autocomplete="off">
+					<div class="col-md-12">
+						<div class="mb-3 form-field">
+							<label class="form-label" for="Name">Name</label>
+							<input type="text" name="Name" class="form-control" placeholder="Name" />
+						</div>
+
+						<div class="mb-3 form-field">
+							<label class="form-label" for="SfConnId">Salesforce Connection</label>
+							<select id="selAddSalesforceConnection" class="form-select form-select-lg form-control" name="SfConnId" data-allow-clear="true" placeholder="Salesforce Database Mapping">
+								<option></option>
+							</select>
+						</div>
+
+						<div class="mb-3 form-field">
+							<label class="form-label" for="DbConnId">DatabaseConnection</label>
+							<select id="selAddDatabaseConnection" class="form-select form-select-lg form-control" name="DbConnId" data-allow-clear="true" placeholder="Salesforce Database Mapping">
+								<option></option>
+							</select>
+						</div>
+					</div>
+
+					<div class="col-12 text-center demo-vertical-spacing">
+						<button type="submit" class="btn btn-primary me-sm-3 me-1">Add Connection</button>
+						<button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Discard</button>
+					</div>
+				</form>
+
+
+			</div>
+		</div>
+	</div>
+</div>
+<!-- /Modal -->
+<!-- Modal -->
+<div class="modal fade" id="mdlEditSalesforceDBMapping" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-lg modal-dialog-centered">
+		<div class="modal-content p-3 p-md-5">
+			<button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+			<div class="modal-body">
+				<div class="text-center mb-4">
+					<h3 class="mb-2">Edit Salesforce Connection</h3>
+					<p class="text-muted">Here you can edit an existing Salesforce connection with essential connection details.</p>
+				</div>
+				<form id="frmEditSalesforceDBMapping" method="post" class="row" autocomplete="off">
+					<div class="col-md-12">
+						<div class="mb-3 form-field">
+							<label class="form-label" for="Name">Name</label>
+							<input type="text" name="Name" class="form-control" placeholder="Name" />
+						</div>
+
+						<div class="mb-3 form-field">
+							<label class="form-label" for="SfConnId">Salesforce Connection</label>
+							<select id="selEditSalesforceConnection" class="form-select form-select-lg form-control" name="SfConnId" data-allow-clear="true" placeholder="Salesforce Connections">
+								<option></option>
+							</select>
+						</div>
+
+						<div class="mb-3 form-field">
+							<label class="form-label" for="DbConnId">Database Connection</label>
+							<select id="selEditDatabaseConnection" class="form-select form-select-lg form-control" name="DbConnId" data-allow-clear="true" placeholder="Database Connections">
+								<option></option>
+							</select>
+						</div>
+					</div>
+					<div class="col-12 text-center demo-vertical-spacing">
+						<button type="submit" class="btn btn-primary me-sm-3 me-1">Edit Mapping</button>
+						<button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Discard</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- /Modal -->

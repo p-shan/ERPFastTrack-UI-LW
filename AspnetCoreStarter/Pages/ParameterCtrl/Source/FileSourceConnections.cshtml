@@ -1,0 +1,328 @@
+@page
+@using ERPFastTrack.Abstraction.AbstractClass;
+@using ERPFastTrack.Common.Operations;
+@model DBConnectionsModel
+@{
+	ViewData["Title"] = "File Source Connections";
+	var roleManager = Utils.GetService<OrgRoleManagerAbstract>(HttpContext);
+}
+
+
+@section VendorStyles {
+    <link rel="stylesheet" href="~/vendor/libs/datatables-bs5/datatables.bootstrap5.dist.css">
+    <link rel="stylesheet" href="~/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.dist.css">
+    <link rel="stylesheet" href="~/vendor/libs/datatables-buttons-bs5/buttons.bootstrap5.dist.css">
+    <link rel="stylesheet" href="~/vendor/libs/&#64;form-validation/umd/styles/index.min.css" />
+    <link rel="stylesheet" href="~/vendor/libs/select2/select2.dist.css" />
+    <link rel="stylesheet" href="~/vendor/libs/tagify/tagify.dist.css" />
+    <link rel="stylesheet" href="~/vendor/libs/bootstrap-select/bootstrap-select.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/typeahead-js/typeahead.dist.css" />
+	<link rel="stylesheet" href="~/vendor/libs/animate-css/animate.dist.css" />
+}
+
+@section VendorScripts {
+    <script src="~/vendor/libs/datatables-bs5/datatables-bootstrap5.dist.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/umd/bundle/popular.min.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/umd/plugin-bootstrap5/index.min.js"></script>
+    <script src="~/vendor/libs/&#64;form-validation/umd/plugin-auto-focus/index.min.js"></script>
+    <script src="~/vendor/libs/select2/select2.dist.js"></script>
+    <script src="~/vendor/libs/tagify/tagify.dist.js"></script>
+    <script src="~/vendor/libs/bootstrap-select/bootstrap-select.dist.js"></script>
+    <script src="~/vendor/libs/typeahead-js/typeahead.dist.js"></script>
+	<script src="~/vendor/libs/bloodhound/bloodhound.dist.js"></script>
+}
+
+@section PageScripts {
+    <script src="~/js/app-file-source-connections.dist.js"></script>
+}
+
+@* ************** Content ************** *@
+<h4 class="mb-4">File Source Connections</h4>
+
+<!-- Permission Table -->
+@if (roleManager.IsOrgSelected)
+{
+<div class="card">
+    <div class="card-datatable table-responsive">
+        <table id="dtFileSourceConnection" class="datatables-permissions table border-top">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+					<th>File Source Name</th>
+					<th>File Location</th>
+                    <th>Archive Location</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+}
+else
+{
+<div class="alert alert-primary alert-dismissible" role="alert">
+	<h5 class="alert-heading mb-2">Please select an Organization!</h5>
+	<p class="mb-0">You will need to select an organization first in order to proceed with this page.</p>
+	<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close">
+	</button>
+</div>
+}
+
+<div class="offcanvas offcanvas-end w-75" data-bs-scroll="true" id="ocEditFileSourceDetail" tabindex="-1" aria-labelledby="ocEditFileSourceDetailLabel">
+	<div class="offcanvas-header">
+		<h5 id="ocEditFileSourceDetailLabel" class="offcanvas-title">Edit File Source Details</h5>
+		<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+	</div>
+	<div class="offcanvas-body mx-0 flex-grow-0">
+		<form id="frmEditFileSourceDetail" method="post" class="row" autocomplete="off">
+			<div class="col-md-12">
+				<div class="mb-3 form-field">
+					<label class="form-label" for="fileSourceDetailName">File Details Name</label>
+					<input type="text" name="fileSourceDetailName" class="form-control" placeholder="File Details Name" />
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="mb-3 form-field">
+					<label class="form-label" for="fileName">File Name</label>
+					<input type="text" name="fileName" class="form-control" placeholder="File Name" />
+				</div>
+			</div>
+
+			<div class="col-md-6">
+				<div class="mb-3 form-field">
+					<label class="form-label" for="delimiter">Delimiter</label>
+					<input type="text" name="delimiter" class="form-control" placeholder="Delimiter" />
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="mb-3 form-field">
+					<label class="form-label" for="dateFieldFormat">Date Field Format</label>
+					<input type="text" name="dateFieldFormat" class="form-control" placeholder="Date Field Format" />
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="mb-3 form-field">
+					<label class="form-label" for="timeFieldFormat">Time Field Format</label>
+					<input type="text" name="timeFieldFormat" class="form-control" placeholder="Time Field Format" />
+				</div>
+			</div>
+
+
+			<div class="col-md-6">
+				<div class="mb-3 form-field">
+					<label class="form-label" for="archiveFileName">Archive File Name</label>
+					<input type="text" name="archiveFileName" class="form-control" placeholder="Archive File Name" />
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="mb-3 form-field">
+                    <label class="switch" style="margin-top: 35px;">
+                        <input type="checkbox" name="hasHeader" class="switch-input">
+						<span class="switch-toggle-slider">
+							<span class="switch-on"></span>
+							<span class="switch-off"></span>
+						</span>
+						<span class="switch-label">Header Present</span>
+					</label>
+				</div>
+			</div>
+			<input type="hidden" name="id" id="editFileSourceConnectionId" />
+			<div class="col-12 text-center demo-vertical-spacing">
+				<button type="submit" class="btn btn-success waves-effect waves-light">Save</button>
+				<button type="button" class="btn btn-label-secondary waves-effect" data-bs-dismiss="offcanvas">Cancel</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<div class="offcanvas offcanvas-end w-75" data-bs-scroll="true" id="ocAddFileSourceDetail" tabindex="-1" aria-labelledby="ocAddFileSourceDetailLabel">
+	<div class="offcanvas-header">
+		<h5 id="ocAddFileSourceDetailLabel" class="offcanvas-title">Add File Source Details</h5>
+		<button type="button" class="btn-close text-reset" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+	</div>
+	<div class="offcanvas-body mx-0 flex-grow-0">
+		<form id="frmAddFileSourceDetail" method="post" class="row" autocomplete="off">
+			<div class="col-md-12">
+				<div class="mb-3 form-field">
+					<label class="form-label" for="fileSourceDetailName">File Details Name</label>
+					<input type="text" name="fileSourceDetailName" class="form-control" placeholder="File Details Name" />
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="mb-3 form-field">
+					<label class="form-label" for="fileName">File Name</label>
+					<input type="text" name="fileName" class="form-control" placeholder="File Name" />
+				</div>
+			</div>
+
+			<div class="col-md-6">
+				<div class="mb-3 form-field">
+					<label class="form-label" for="delimiter">Delimiter</label>
+					<input type="text" name="delimiter" class="form-control" placeholder="Delimiter" />
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="mb-3 form-field">
+					<label class="form-label" for="dateFieldFormat">Date Field Format</label>
+					<input type="text" name="dateFieldFormat" class="form-control" placeholder="Date Field Format" />
+				</div>
+			</div>
+			<div class="col-md-6">
+				<div class="mb-3 form-field">
+					<label class="form-label" for="timeFieldFormat">Time Field Format</label>
+					<input type="text" name="timeFieldFormat" class="form-control" placeholder="Time Field Format" />
+				</div>
+			</div>
+
+
+			<div class="col-md-6">
+				<div class="mb-3 form-field">
+					<label class="form-label" for="archiveFileName">Archive File Name</label>
+					<input type="text" name="archiveFileName" class="form-control" placeholder="Archive File Name" />
+				</div>
+			</div>
+			<div class="col-md-6">
+                <div class="mb-3 form-field">
+                    <label class="switch" style="margin-top: 35px;">
+						<input type="checkbox" name="hasHeader" class="switch-input">
+						<span class="switch-toggle-slider">
+							<span class="switch-on"></span>
+							<span class="switch-off"></span>
+						</span>
+						<span class="switch-label">Header Present</span>
+					</label>
+				</div>
+			</div>
+			<div class="col-12 text-center demo-vertical-spacing">
+				<button type="submit" class="btn btn-success waves-effect waves-light">Save</button>
+				<button type="button" class="btn btn-label-secondary waves-effect" data-bs-dismiss="offcanvas">Cancel</button>
+			</div>
+		</form>
+	</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade modal-xl" id="mdlEditFileSourceConnection" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content p-3 p-md-5">
+			<button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+			<div class="modal-body">
+				<div class="text-center mb-4">
+					<h3 class="mb-2">Edit File Source Connection</h3>
+					<p class="text-muted">Here you can edit an existing File Source connections with essential connection details.</p>
+				</div>
+
+				<form id="frmEditFileSourceConnection" method="post" class="row" autocomplete="off">
+					<div class="col-md-12">
+						<div class="mb-3 form-field">
+							<label class="form-label" for="name">Connection Name</label>
+							<input type="text" name="Name" class="form-control" placeholder="Connection Name" />
+						</div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="mb-3 form-field">
+                            <label class="form-label" for="fileLocation">File Location</label>
+                            <input type="text" name="FileLocation" class="form-control" placeholder="File Location" />
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="mb-3 form-field">
+                            <label class="form-label" for="archiveLocation">Archive Location</label>
+                            <input type="text" name="ArchiveLocation" class="form-control" placeholder="Archive Location" />
+                        </div>
+                    </div>
+
+                    <div class="container pt-2 pb-2 border border-secondary rounded">
+                        <h4>File Details</h4>
+                        <table id="dtEditFileSourceDetail" class="table border-top">
+                            <thead>
+                                <tr>
+                                    <th>File Source Detail Name</th>
+                                    <th>File Name</th>
+                                    <th>Delimieter</th>
+                                    <th>Date Field Format</th>
+                                    <th>Time Field Format</th>
+                                    <th>Archive File Name</th>
+                                    <th>Has Header</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+					<input type="hidden" name="id" id="editFileSourceConnectionId" />
+					<div class="col-12 text-center demo-vertical-spacing">
+						<button type="submit" class="btn btn-primary me-sm-3 me-1">Edit Connection</button>
+						<button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Discard</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- /Modal -->
+<!-- Modal -->
+<div class="modal fade modal-xl" id="mdlAddFileSourceConnection" tabindex="-1" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered">
+		<div class="modal-content p-3 p-md-5">
+			<button type="button" class="btn-close btn-pinned" data-bs-dismiss="modal" aria-label="Close"></button>
+			<div class="modal-body">
+				<div class="text-center mb-4">
+					<h3 class="mb-2">Add New File Source Connection</h3>
+					<p class="text-muted">Here you can create a new File Source connection with essential connection details.</p>
+				</div>
+
+                <form id="frmAddFileSourceConnection" method="post" class="row" autocomplete="off">
+                    <div class="col-md-12">
+                        <div class="mb-3 form-field">
+                            <label class="form-label" for="name">Connection Name</label>
+                            <input type="text" name="Name" class="form-control" placeholder="Connection Name" />
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="mb-3 form-field">
+                            <label class="form-label" for="fileLocation">File Location</label>
+                            <input type="text" name="FileLocation" class="form-control" placeholder="File Location" />
+                        </div>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="mb-3 form-field">
+                            <label class="form-label" for="archiveLocation">Archive Location</label>
+                            <input type="text" name="ArchiveLocation" class="form-control" placeholder="Archive Location" />
+                        </div>
+                    </div>
+
+                    <div class="container pt-2 pb-2 border border-secondary rounded">
+                        <h4>File Details</h4>
+                        <table id="dtAddFileSourceDetail" class="table border-top">
+                            <thead>
+                                <tr>
+                                    <th>File Source Detail Name</th>
+                                    <th>File Name</th>
+                                    <th>Delimieter</th>
+                                    <th>Date Field Format</th>
+                                    <th>Time Field Format</th>
+                                    <th>Archive File Name</th>
+                                    <th>Has Header</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+
+					<div class="col-12 text-center demo-vertical-spacing">
+						<button type="submit" class="btn btn-primary me-sm-3 me-1">Add Connection</button>
+						<button type="reset" class="btn btn-label-secondary" data-bs-dismiss="modal" aria-label="Close">Discard</button>
+					</div>
+				</form>
+
+			</div>
+		</div>
+	</div>
+</div>
+<!-- Modal -->
