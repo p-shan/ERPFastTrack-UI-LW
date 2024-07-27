@@ -25,7 +25,7 @@ namespace ERPFastTrack.LicenseProcessor.Internals
                 var _httpClient = new HttpClient();
                 HttpContent httpContent = new StringContent(JObject.FromObject(dynamicObj).ToString(), Encoding.UTF8, "application/json");
 
-                HttpResponseMessage response = await _httpClient.PostAsync("http://localhost:5023/LicenseValidate", httpContent);
+                HttpResponseMessage response = await _httpClient.PostAsync("https://erpfasttrack-backendsvcs.azurewebsites.net/LicenseValidate", httpContent);
 
                 response.EnsureSuccessStatusCode();
 
@@ -42,12 +42,12 @@ namespace ERPFastTrack.LicenseProcessor.Internals
 
         public string GetInstanceId()
         {
-            var instanceId = Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID");
+            var instanceId = Environment.GetEnvironmentVariable("WEB_INSTANCE_ID");
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
             if (env == "Development" && string.IsNullOrEmpty(instanceId))
                 instanceId = "12345";
 
-            return instanceId;
+            return "12345"; // instanceId;
         }
 
         public LicenseExistsResponse LicenseExist()

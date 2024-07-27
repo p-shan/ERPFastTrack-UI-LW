@@ -12,6 +12,8 @@ using ERPFastTrack.SourceProcessor.Extensions;
 using ERPFastTrack.LicenseProcessor.Background;
 using ERPFastTrack.LicenseProcessor.Internals;
 using ERPFastTrack.DBGround.DBModels.Identity;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddSalesforceProcessors(builder.Configuration);
@@ -24,6 +26,7 @@ builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 var environment = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
 string connectionString = string.Empty;
 string schema = "dbo";
+bool createDb = false;
 if (environment != "Development")
 {
     connectionString = Environment.GetEnvironmentVariable("ERPFT_CONNECTION_STRING");
@@ -33,11 +36,15 @@ if (environment != "Development")
     schema = Environment.GetEnvironmentVariable("ERPFT_DB_SCHEMA");
     if (string.IsNullOrWhiteSpace(schema))
         schema = "dbo";
+
+    createDb = string.Equals(Environment.GetEnvironmentVariable("ERPFT_RUNFULLPKG"), "true", StringComparison.InvariantCultureIgnoreCase);
 }
 else
 {
     connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 }
+
+
 
 // Add services to the container.
 builder.Services.AddDbContext<ERPFastTrackUIContext>(options =>
@@ -70,6 +77,29 @@ builder.Services.AddTransient<SourceOperationsBase>();
 builder.Services.AddHostedService<LicenseBgProcessor>();
 
 var app = builder.Build();
+
+if(createDb)
+{
+    // Ensure database is created and apply migrations at startup
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider.GetRequiredService<ERPFastTrackUIContext>();
+
+        // Ensure the database is created
+        dbContext.Database.EnsureCreated();
+
+        // Check if there are pending migrations
+        var pendingMigrations = dbContext.Database.GetPendingMigrations();
+        if (pendingMigrations.Any())
+        {
+            var migrator = dbContext.Database.GetService<IMigrator>();
+            foreach (var migration in pendingMigrations)
+            {
+                migrator.Migrate(migration);
+            }
+        }
+    }
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

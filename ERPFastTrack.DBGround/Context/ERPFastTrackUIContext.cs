@@ -2,19 +2,33 @@ using ERPFastTrack.DBGround.DBModels.Custom;
 using ERPFastTrack.DBGround.DBModels.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using System.Reflection.Emit;
+using System.Runtime.CompilerServices;
 
 namespace ERPFastTrack.DBGround.Context;
 
 public class ERPFastTrackUIContext : IdentityDbContext<UserData>
 {
+    public bool UseIntProperty { get; set; }
+    public string Schema { get; }
     public ERPFastTrackUIContext(DbContextOptions<ERPFastTrackUIContext> options)
         : base(options)
     {
+        var schema = Environment.GetEnvironmentVariable("ERPFT_DB_SCHEMA");
+        if (string.IsNullOrWhiteSpace(schema))
+            Schema = "dbo";
+        else Schema = schema;
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        base.OnConfiguring(optionsBuilder);
+        optionsBuilder.ReplaceService<IModelCacheKeyFactory, DynamicSchemaModelCacheKeyFactory>();
     }
 
     private static string GetConnectionString()
-    {
+    {        
         return Environment.GetEnvironmentVariable("MY_CONNECTION_STRING");
     }
 
@@ -26,10 +40,7 @@ public class ERPFastTrackUIContext : IdentityDbContext<UserData>
         // Add your customizations after calling base.OnModelCreating(builder);
 
         // Set the default schema for all entities
-        var schema = Environment.GetEnvironmentVariable("ERPFT_DB_SCHEMA");
-        if (string.IsNullOrWhiteSpace(schema))
-            schema = "dbo";
-        builder.HasDefaultSchema(schema);
+        builder.HasDefaultSchema(Schema);
 
         builder.Entity<Organization>()
             .HasIndex(e => e.Name)

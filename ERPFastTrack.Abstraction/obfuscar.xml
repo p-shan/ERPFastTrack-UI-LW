@@ -16,7 +16,8 @@
   <Var name="HideStrings" value="true" />
   <Var name="OptimizeMethods" value="true" />
   <Var name="SuppressIldasm" value="false" />
-
+  <Var name="KeyFile" value="D:\MyWork\Eventus\UI_Work\Vuexy\vuexyadmin-970\vuexy-admin-v9.7.0\aspnet-core\ERPFastTrack.v2.UI.LW\AspnetCoreStarter\erpfasttrack-signkey.snk" />
+  
   <Module file="ERPFastTrack.Abstraction.dll">
     <SkipEnums value="true" />
   </Module>

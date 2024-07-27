@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>net7.0</TargetFramework>
+        <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
@@ -12,12 +12,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\ERPFastTrack.Common\ERPFastTrack.Common.csproj" />
-    </ItemGroup>
-    <ItemGroup>
-        <PackageReference Include="Hsu.Obfuscar.DotNetTool" Version="2023.412.20-rc203929">
-            <PrivateAssets>all</PrivateAssets>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-        </PackageReference>
     </ItemGroup>
 
     <!--<ItemGroup>
