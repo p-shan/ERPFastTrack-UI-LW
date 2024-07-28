@@ -1,7 +1,5 @@
 'use strict';
 
-const driver = window.driver.js.driver;
-
 function StartPageLoader() {
     $.blockUI({
         message: '<div class="spinner-border text-white" role="status"></div>',

@@ -42,12 +42,16 @@ namespace ERPFastTrack.LicenseProcessor.Internals
 
         public string GetInstanceId()
         {
+            var webinstanceId = Environment.GetEnvironmentVariable("WEBSITE_INSTANCE_ID") ?? "12345";
             var instanceId = Environment.GetEnvironmentVariable("WEB_INSTANCE_ID");
             var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT");
+
             if (env == "Development" && string.IsNullOrEmpty(instanceId))
                 instanceId = "12345";
 
-            return "12345"; // instanceId;
+            if (string.IsNullOrEmpty(instanceId))
+                return webinstanceId;
+            else return instanceId;
         }
 
         public LicenseExistsResponse LicenseExist()

@@ -1,7 +1,1 @@
-.offcanvas {
-    z-index: 2060 !important;
-}
-
-.offcanvas-backdrop {
-    z-index: 2000 !important;
-}
+.offcanvas{z-index:2060 !important}.offcanvas-backdrop{z-index:2000 !important}

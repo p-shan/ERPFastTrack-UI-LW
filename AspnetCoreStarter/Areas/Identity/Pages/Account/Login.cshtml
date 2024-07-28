@@ -2,8 +2,6 @@
 @using AspnetCoreStarter.Areas.Identity.Pages.Account;
 @model LoginModel
 @{
-
-
 	Layout = "/Pages/Layouts/_BlankLayout.cshtml";
 	ViewData["Title"] = "Login";
 }
@@ -54,12 +52,12 @@
 						</div>
 
 						<div class="mb-3 form-password-toggle">
-							<div class="d-flex justify-content-between">
+							@* <div class="d-flex justify-content-between">
 								<label asp-for="Input.Password" class="form-label">Password</label>
 								<a id="forgot-password" asp-page="./ForgotPassword">
 									<small>Forgot Password?</small>
 								</a>
-							</div>
+							</div> *@
 							<div class="input-group input-group-merge">
 								<input asp-for="Input.Password" id="password" class="form-control" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password" />
 								<span class="input-group-text cursor-pointer"><i class="ti ti-eye-off"></i></span>
@@ -78,13 +76,13 @@
 						</div>
 					</form>
 
-					<p class="text-center">
+					@* <p class="text-center">
 						<span>New on our platform?</span>
 
 						<a asp-page="./Register" asp-route-returnUrl="@Model.ReturnUrl">
 							<span>Create an account</span>
 						</a>
-					</p>
+					</p> *@
 					
 				</div>
 			</div>

@@ -5,15 +5,9 @@ namespace ERPFastTrack.DBGround.Context
 {
     public class DynamicSchemaModelCacheKeyFactory : IModelCacheKeyFactory
     {
-        public object Create(DbContext context, bool designTime)
-        {
-            if (context is ERPFastTrackUIContext dynamicContext)
-            {
-                return (context.GetType(), dynamicContext.Schema);
-            }
-
-            return context.GetType();
-        }
+        public object Create(DbContext context, bool designTime) => context is ERPFastTrackUIContext dynamicContext
+        ? (context.GetType(), dynamicContext.UseIntProperty, designTime)
+        : (object)context.GetType();
     }
 
 }

@@ -45,14 +45,21 @@ namespace AspnetCoreStarter.Pages
                 {
                     var res = await _licenseAuth.Authenticate(Input.LicenseCode, _orgRoleManagerAbstract?.Role?.OrgName);
 
-                    var license = await _context.Licenses.FirstOrDefaultAsync();
-                    _context.Entry(license).State = EntityState.Modified;
-                    license.IsValid = true;
-                    license.LastValidation = DateTime.Now;
-                    license.LicenseCode = Input.LicenseCode;
-                    await _context.SaveChangesAsync();
+                    if (res.IsValid)
+                    {
+                        var license = await _context.Licenses.FirstOrDefaultAsync();
+                        _context.Entry(license).State = EntityState.Modified;
+                        license.IsValid = true;
+                        license.LastValidation = DateTime.Now;
+                        license.LicenseCode = Input.LicenseCode;
+                        await _context.SaveChangesAsync();
 
-                    return LocalRedirect(returnUrl);
+                        return LocalRedirect(returnUrl);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, "Invalid license code.");
+                    }
                 }
                 else
                 {
