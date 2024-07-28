@@ -420,3 +420,6 @@ ASALocalRun/
 /ControllerBaseAutomator/Form1.Designer.cs
 /ControllerBaseAutomator/Form1.cs
 /AspnetCoreStarter/Properties/launchSettings.json
+
+*.dist.js
+*.dist.css
