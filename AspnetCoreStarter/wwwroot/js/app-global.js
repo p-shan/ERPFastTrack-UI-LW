@@ -1,5 +1,7 @@
 'use strict';
 
+const driver = window.driver.js.driver;
+
 function StartPageLoader() {
     $.blockUI({
         message: '<div class="spinner-border text-white" role="status"></div>',
@@ -845,7 +847,10 @@ var parameterCtrl = {
                     ajax: {
                         url: data.uri(),
                         dataSrc: function (d) {
-                            if (data.data == null) {
+                            if (d.data != null) {
+                                return d.data;
+                            }
+                            else if (data.data == null) {
                                 return [];
                             } else {
                                 return d[data.data];

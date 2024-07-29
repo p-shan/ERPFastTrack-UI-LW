@@ -27,11 +27,6 @@ public class ERPFastTrackUIContext : IdentityDbContext<UserData>
         optionsBuilder.ReplaceService<IModelCacheKeyFactory, DynamicSchemaModelCacheKeyFactory>();
     }
 
-    private static string GetConnectionString()
-    {        
-        return Environment.GetEnvironmentVariable("MY_CONNECTION_STRING");
-    }
-
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);

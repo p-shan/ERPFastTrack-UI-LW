@@ -2,8 +2,6 @@
 @using AspnetCoreStarter.Pages;
 @model IndexModel
 @{
-
-
 	Layout = "/Pages/Layouts/_BlankLayout.cshtml";
 	ViewData["Title"] = "License";
 }
@@ -16,6 +14,21 @@
 	<script src="~/vendor/libs/&#64;form-validation/umd/bundle/popular.min.js"></script>
 	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-bootstrap5/index.min.js"></script>
 	<script src="~/vendor/libs/&#64;form-validation/umd/plugin-auto-focus/index.min.js"></script>
+	<script type="text/javascript">
+		function copyLicenseRequest() {
+			// Get the text field
+			var copyText = "@ViewData["RequestLicenseContent"]";
+			navigator.clipboard.writeText(copyText);
+
+			toastr.options.progressBar = true;
+			toastr.success("License Request copied to clipboard!")
+		}
+		$(document).ready(function () {
+			$("#btnRequestLicense").click(function () {
+				copyLicenseRequest();
+			});
+		});
+	</script>
 }
 
 @section PageStyles {
@@ -75,6 +88,7 @@
 							<button id="btnAuthenticate" class="btn btn-primary d-grid w-100" type="submit">Authenticate</button>
 						</div>
 					</form>
+					<button type="button" class="btn btn-sm pull-right float-right btn-outline-warning" id="btnRequestLicense">Request License</button>
 				</div>
 			</div>
 			<!-- /Register -->

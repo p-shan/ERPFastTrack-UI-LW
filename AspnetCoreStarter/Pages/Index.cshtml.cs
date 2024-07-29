@@ -41,6 +41,8 @@ namespace AspnetCoreStarter.Pages
             _context = context;
             _orgRoleManagerAbstract = orgRoleManagerAbstract;
             _licenseAuth = licenseAuth;
+
+            RequestLicenseContent = _licenseAuth.GetDownloadableRequest();
         }
 
         [BindProperty]
@@ -49,6 +51,8 @@ namespace AspnetCoreStarter.Pages
         [TempData]
         public string ErrorMessage { get; set; }
         public string ReturnUrl { get; set; }
+
+        public string RequestLicenseContent { get; set; }
 
         /// <summary>
         ///     This API supports the ASP.NET Core Identity default UI infrastructure and is not intended to be used
@@ -91,7 +95,7 @@ namespace AspnetCoreStarter.Pages
             {
                 return RedirectToPage("/LicenseExpired");
             }
-
+            ViewData["RequestLicenseContent"] = RequestLicenseContent;
             return Page();
         }
 

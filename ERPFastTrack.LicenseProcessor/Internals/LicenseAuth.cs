@@ -1,5 +1,6 @@
 using ERPFastTrack.DBGround.Context;
 using ERPFastTrack.DBGround.DBModels.Custom;
+using Microsoft.Extensions.Primitives;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Text;
@@ -38,6 +39,38 @@ namespace ERPFastTrack.LicenseProcessor.Internals
             }
 
             return res;
+        }
+
+        private static readonly char[] chars =
+        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890".ToCharArray();
+
+        public string GetDownloadableRequest()
+        {
+            string id = GetInstanceId();
+            StringBuilder result = new StringBuilder();
+
+            for (int i = 0; i < 10; i++)
+            {
+                if (i == 5)
+                {
+                    result.Append(id + "\n");
+
+                    continue;
+                }
+
+                StringBuilder buildStr = new StringBuilder(id.Length);
+                Random random = new Random();
+
+                for (int j = 0; j < id.Length; j++)
+                {
+                    buildStr.Append(chars[random.Next(chars.Length)]);
+                }
+                result.Append(buildStr.ToString() + "\n");
+            }
+
+
+
+            return result.ToString();
         }
 
         public string GetInstanceId()

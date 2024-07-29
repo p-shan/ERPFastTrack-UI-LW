@@ -96,7 +96,7 @@ try
                 var dbContext = scope.ServiceProvider.GetRequiredService<ERPFastTrackUIContext>();
 
                 // Ensure the database is created
-                dbContext.Database.EnsureCreated();
+                var result = dbContext.Database.EnsureCreated();
 
                 // Check if there are pending migrations
                 var pendingMigrations = dbContext.Database.GetPendingMigrations();
